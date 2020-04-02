@@ -4,7 +4,7 @@ Module for reading of Ichthyop outputs
 
 import xarray as xr
 import numpy as np
-from netcdftime import utime
+from cftime import utime
 import re
 
 def extract_dataset(filename, dmin=None, dmax=None, dstride=None, tmin=None, tmax=None, tstride=None):

@@ -15,20 +15,17 @@ The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj`
 
 .. literalinclude:: examples/plot_dataset.py
 
-.. ipython:: python
-    :suppress:
-
+.. plot::
+    
     import os
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "source/examples/plot_dataset.py"
+    fpath = "examples/plot_dataset.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
         exec(code)
 
-.. ipython:: python
-    
     plt.subplots_adjust(left=0.01, bottom=0.01, top=0.95)
 
     # plot trajectories without colors 
@@ -46,7 +43,6 @@ The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj`
     ichplot.map_traj(data, layout='filled', color='time', size=pointsize, **mapsettings)
     plt.title('Time')
     
-    @savefig plotting_example.png width=100%
     plt.show()
 
 

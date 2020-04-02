@@ -4,4 +4,6 @@ oscar_ichthyop-run201706161408.nc
 old_scripts
 figs
 ichthyop/doc/build
-ichthyop/doc/source/_static/ichthyop-example.nc
+ichthyop/doc/source/savefig/plotting_example.png
+ichthyop/doc/source/generated/
+ichthyop/ichthyop/__pycache__/

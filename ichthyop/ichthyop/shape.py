@@ -335,4 +335,4 @@ if __name__ == '__main__':
     plot_shapes(output, figname)
 
     output = read_shapefile('/home/nbarrier/Modeles/ichthyop/test_shapefiles/java_test/TestShape/java_test.shp')
-    print output[0]
+    print(output[0])

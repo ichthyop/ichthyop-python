@@ -1,14 +1,14 @@
 import ichthyop.read as ichread
 import ichthyop.plot as ichplot
-import pylab as plt
+import matplotlib.pyplot as plt
 
-filename = 'source/_static/ichthyop-example.nc'
+filename = '_static/ichthyop-example.nc'
 
 # extracts the trajectories of drifters numbers with a step of 1000
-data = ichread.extract_dataset(filename, dstride=1000)
+data = ichread.extract_dataset(filename, dstride=100)
 
 # settings of the map properties (resolution='intermediary')
-mapsettings = {'resolution': 'h'}
+mapsettings = {'resolution': 'l'}
 
 # size of the points
 pointsize = 20
