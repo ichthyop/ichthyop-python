@@ -7,6 +7,7 @@
 Ichthyop (http://ichthyop.org/) is a free Java tool designed to study the effects of physical and biological factors on ichthyoplankton dynamics (code available [here](https://github.com/ichthyop/ichthyop)).
 
 This python package is dedicated to the analysis of Ichthyop's outputs. 
-
+- Plots trajectories (as a function of time, depth, etc.)
+- Make movies
 
 
