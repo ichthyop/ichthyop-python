@@ -3,7 +3,8 @@ plot_dens_Ichthyop_v3.R
 oscar_ichthyop-run201706161408.nc
 old_scripts
 figs
-ichthyop/doc/build
-ichthyop/doc/source/savefig/plotting_example.png
-ichthyop/doc/source/generated/
-ichthyop/ichthyop/__pycache__/
+doc/build
+doc/source/savefig/plotting_example.png
+doc/source/generated/
+**/__pycache__
+**/*.pyc
