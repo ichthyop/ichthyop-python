@@ -1,3 +1,6 @@
+build
+dist
+**/*egg-info*
 scripts_ichthyop_v3_R.zip
 plot_dens_Ichthyop_v3.R
 oscar_ichthyop-run201706161408.nc
