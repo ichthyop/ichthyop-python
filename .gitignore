@@ -1,4 +1,4 @@
-build.sh
+package_python.sh
 build
 dist
 **/*egg-info*
