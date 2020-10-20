@@ -1,8 +1,8 @@
 ![License](https://img.shields.io/github/license/ichthyop/ichthyop-python)
+[![DOI](https://zenodo.org/badge/286680975.svg)](https://zenodo.org/badge/latestdoi/286680975)
 [![PyPI](https://img.shields.io/pypi/v/ichthyop)](https://pypi.org/project/ichthyop/)
 [![Latest Release](https://img.shields.io/github/release/ichthyop/ichthyop-python)](https://github.com/ichthyop/ichthyop-python/issues)
 [![GitHub Issues](https://img.shields.io/github/issues/ichthyop/ichthyop-python)](https://github.com/ichthyop/ichthyop-python/issues)
-<!-- [![DOI](https://zenodo.org/badge/154350333.svg)](https://zenodo.org/record/4091652) -->
 
 <div align="center">
     <img src="https://avatars1.githubusercontent.com/u/69504072?s=400&u=8766ef42c78a1fbf1930e756d7b9e530dec69d19&v=4" width=100>
