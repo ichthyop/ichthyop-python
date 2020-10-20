@@ -30,27 +30,15 @@ setup(
     include_package_data=True,
     url="https://github.com/ichthyop/ichthyop-python",
     packages=find_packages(),
-    install_requires=['docutils>=0.12',
-                      'sphinx>=1.3.1',
-                      'pylint>=1.4.2',
-                      'pyenchant>=1.6.6',
-                      'pep8>=1.6.2',
-                      'pyflakes>=0.9.2',
-                      'check-manifest>=0.25',
+    install_requires=['xarray>=0.1',
                       'numpy>=1.9',
                       'netCDF4>=1.1', 
                       'matplotlib>=1.4',
                       'basemap>=1.0',
+                      'pyshp'
                      ],
-    install_requires=['pyshp', 'numpy', 'Basemap'],
-    requires=['numpy(>=1.9.2)',
-              'matplotlib(>=1.43)',
-              'basemap(>=1.0.7)',
-              'netcdf4(>1.1.9)',
-             ],
 
-    with open('README.md') as fin:
-        long_description = fin.read()
+    long_description = long_description,
 
     classifiers = [
         #"Development Status :: 5 - Production/Stable",
@@ -69,10 +57,4 @@ setup(
     # ++ test_suite =
     # ++ download_url
     platforms=['linux', 'mac osx'],
-    scripts = ['pypago/bin/make_grid.py', 
-               'pypago/bin/make_gridsec.py',
-               'pypago/bin/make_areas.py',
-               'pypago/bin/make_coords.py',
-               'pypago/guis/gui_sections_edition.py',
-               'pypago/guis/gui_grid_model.py']
 )
