@@ -6,7 +6,6 @@ import shapefile as pyshp
 import pylab as plt
 import matplotlib
 from matplotlib.patches import Polygon
-from mpl_toolkits.basemap import Basemap
 
 STRLEN = 10
 
@@ -245,7 +244,7 @@ def read_shapefile(filename):
 
     return output
 
-def plot_shapes(listofshapes, figname, **dictbmap):
+def plot_shapes(listofshapes, figname, projection):
 
     """
     Plots a list of shapes into a map.
@@ -270,9 +269,8 @@ def plot_shapes(listofshapes, figname, **dictbmap):
     # initialisation of the figure, axis and basemap
     # obects. Drawing of the coastlines
     plt.figure()
-    ax = plt.gca()
-    bmap = Basemap(**dictbmap)
-    bmap.drawcoastlines()
+    ax = plt.axes(projection=projection)
+    ax.coastlines()
 
     # loop over the shapes
     for shape in listofshapes:
@@ -285,7 +283,7 @@ def plot_shapes(listofshapes, figname, **dictbmap):
 
         # conversion of lon/lat into map coordinates, and
         # conversion into Nx2 arrays for use in Patches
-        xmap, ymap = bmap(shape.longitude, shape.latitude)
+        xmap, ymap = shape.longitude, shape.latitude
         xymap = np.transpose(np.array([xmap, ymap]))
 
         # define the type of filling depending on the type of area
@@ -293,7 +291,7 @@ def plot_shapes(listofshapes, figname, **dictbmap):
 
         # draw the polygon on the map
         polygon = Polygon(xymap, closed=True, hatch=hatch, fill=True, label=shape.name,
-                          facecolor=next(colorcycle), edgecolor='black', alpha=0.7)
+                          facecolor=next(colorcycle), edgecolor='black', alpha=0.7, transform=ccrs.PlateCarree())
         ax.add_patch(polygon)
 
     # add the legend
