@@ -116,7 +116,7 @@ if __name__ == '__main__':
     ndrifter = data.dims['drifter']
     zone = np.zeros(ndrifter) - 999
 
-    print lon.shape, lat.shape
+    print(lon.shape, lat.shape)
 
     for p in xrange(0, 3):
         iok = np.nonzero((lon[0]>=lonzone[p]) & (lon[0]<=lonzone[p+1]))[0]
@@ -124,11 +124,11 @@ if __name__ == '__main__':
 
     data['zone'] = (['drifter'], zone)
   
-    print np.unique(zone)
+    print(np.unique(zone))
 
     ret = []
     retzone = shape.Shape([0., 1, 1, 0], [37.5, 37.5, 39, 39], 'toto', 'rec')
-    print retzone
+    print(retzone)
     retzone.longitude += -0.5
     retzone.latitude += 1
     ret.append(retzone)
@@ -144,9 +144,9 @@ if __name__ == '__main__':
         plt.gca().add_patch(polygon)
     
     output = extract_connected_traj(data, zone, ret)
-    print data
+    print(data)
     data = data.isel(drifter=output)
-    print data
+    print(data)
     plot.map_traj(data, color='zone', suppress_ticks=0, resolution='i')
     #plot.map_traj(data.isel(drifter=output), color='k', suppress_ticks=0, resolution='i')
     
