@@ -123,7 +123,7 @@ if __name__ == '__main__':
     ndrifter = data.dims['drifter']
     zone = np.zeros(ndrifter) - 999
 
-    print lon.shape, lat.shape
+    print(lon.shape, lat.shape)
 
     for p in xrange(0, 3):
         iok = np.nonzero((lon[0]>=lonzone[p]) & (lon[0]<=lonzone[p+1]))[0]
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     data['zone'] = zone
   
     plot.map_traj(data, color='zone', suppress_ticks=0, resolution='i')
-    print np.unique(zone)
+    print(np.unique(zone))
 
     ret = []
     retzone = shape.Shape([-1, 1, 1, -1], [37.5, 37.5, 39, 39], 'toto', 'rec')
@@ -154,6 +154,6 @@ if __name__ == '__main__':
 
     output = compute_connectivity(data, zone, ret)
     output = output.mean(dim=['time'])
-    print output
+    print(output)
 
     plot_connectivity(output)

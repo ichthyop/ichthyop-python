@@ -1,6 +1,5 @@
 import numpy as np
 import pylab as plt
-from mpl_toolkits.basemap import Basemap
 import read 
 import plot
 import xarray as xr
@@ -110,7 +109,7 @@ if __name__ == '__main__':
     # extracts the first time step
     data = read.extract_dataset(filename, tmin=0, tmax=10)
     dens = compute_density(data)
-    print dens
+    print(dens)
     
 
     lonmin = data['lon'].min().values
@@ -126,7 +125,6 @@ if __name__ == '__main__':
         zone[iok] = p
 
     dens = compute_density(data, zone=zone)
-    print dens
     
     """
 
