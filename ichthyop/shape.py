@@ -251,7 +251,7 @@ def plot_shapes(listofshapes, figname, projection):
 
     :param list listofshapes: List of Shape objects.
     :param str figname: Figure name
-    :param dict dictbmap: Arguments of the Basemap class
+    :param dict projection: Cartopy CRS object (for instance crs.MollWeide())
 
     """
 

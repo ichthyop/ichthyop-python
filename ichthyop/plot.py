@@ -211,9 +211,9 @@ def make_movie(data, extent, dirout='./', layout='lines', size=5):
     ffmpeg or mencoder.
 
     :param xarray.Dataset data: The input dataset
+    :param list extent: Geographical extent [lonmin, lonmax, latmin, latmax]
     :param str layout: The map background ('lines', 'fill' or 'etopo')
     :param int size: The dot size
-    :param dict dictbmap: Additional arguments for the map definition
     """
 
     ntime = data.dims['time']
