@@ -13,3 +13,6 @@ doc/source/savefig/plotting_example.png
 doc/source/generated/
 **/__pycache__
 **/*.pyc
+doc/source/_static/*png
+doc/source/_static/movie.**
+**/compile.sh
