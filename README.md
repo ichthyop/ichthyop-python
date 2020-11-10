@@ -1,7 +1,7 @@
 ![License](https://img.shields.io/github/license/ichthyop/ichthyop-python)
 [![DOI](https://zenodo.org/badge/286680975.svg)](https://zenodo.org/badge/latestdoi/286680975)
 [![PyPI](https://img.shields.io/pypi/v/ichthyop)](https://pypi.org/project/ichthyop/)
-[![Latest Release](https://img.shields.io/github/release/ichthyop/ichthyop-python)](https://github.com/ichthyop/ichthyop-python/issues)
+[![Latest Release](https://img.shields.io/github/release/ichthyop/ichthyop-python)](https://github.com/ichthyop/ichthyop-python/releases)
 [![GitHub Issues](https://img.shields.io/github/issues/ichthyop/ichthyop-python)](https://github.com/ichthyop/ichthyop-python/issues)
 
 <div align="center">
