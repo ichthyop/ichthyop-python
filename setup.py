@@ -34,7 +34,7 @@ setup(
                       'numpy>=1.9',
                       'netCDF4>=1.1', 
                       'matplotlib>=1.4',
-                      'basemap>=1.0',
+                      'cartopy',
                       'pyshp'
                      ],
 
