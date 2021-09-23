@@ -234,7 +234,7 @@ def make_movie(data, extent, dirout='./', layout='lines', size=5):
         temp = data.isel(time=slice(0, it+1))
 
         fig = plt.figure()
-        ax = plt.gca(projection = ccrs.PlateCarree())
+        ax = plt.axes(projection = ccrs.PlateCarree())
         layfunc(ax)
         ax.set_extent(extent)
         plot_traj(temp, 'drifter', size=size)
