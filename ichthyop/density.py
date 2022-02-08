@@ -40,8 +40,8 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
     # to understand this formulae. simply keep in mind that lat is a linear function of index,
     # same for longitude
     # this is done here so that the "big" lonout/latout arrays are manipulated only once.
-    indexlon = np.round((len(lonout) - 1) * (data['lon'] - lonout[0]) / (lonout[-1] - lonout[0]))
-    indexlat = np.round((len(latout) - 1) * (data['lat'] - latout[0]) / (latout[-1] - latout[0]))
+    indexlon = np.floor((len(lonout) - 1) * (data['lon'] - lonout[0]) / (lonout[-1] - lonout[0]))
+    indexlat = np.floor((len(latout) - 1) * (data['lat'] - latout[0]) / (latout[-1] - latout[0]))
 
     # conversion into int (obligatory to use as numpy index)
     indexlon = indexlon.astype(np.int)    # ntime, ndrifter
