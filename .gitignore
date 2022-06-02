@@ -16,3 +16,8 @@ doc/source/generated/
 doc/source/_static/*png
 doc/source/_static/movie.**
 **/compile.sh
+
+doc/_build
+doc/generated
+doc/_static/map*png
+doc/_static/temp*png
