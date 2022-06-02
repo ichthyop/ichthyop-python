@@ -21,3 +21,4 @@ doc/_build
 doc/generated
 doc/_static/map*png
 doc/_static/temp*png
+doc/_static/*ogg
