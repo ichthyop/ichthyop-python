@@ -18,6 +18,6 @@ pointsize = 15
 # priov
 extent = [27.007700909458563, 84.9354467498432, -39.823827920685424, -12.99684411453186]
 dirout = '_static'
-#ichplot.make_movie(data, extent=extent, dirout=dirout, layout='etopo', size=pointsize)
+ichplot.make_movie(data, extent=extent, dirout=dirout, layout='etopo', size=pointsize)
 
 os.system("ffmpeg -y -framerate 24 -pattern_type glob -i '%s/temp*.png' -codec:v libtheora -qscale:v 1 %s/movie.ogg" %(dirout, dirout))
