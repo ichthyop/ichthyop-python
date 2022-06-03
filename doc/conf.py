@@ -14,6 +14,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
 
 # -- Project information -----------------------------------------------------
 
@@ -22,8 +23,9 @@ copyright = '2020, Nicolas Barrier'
 author = 'Nicolas Barrier'
 
 # The full version, including alpha/beta/rc tags
-import ichthyop
-version = ichthyop.__version__
+VERSION_FILE = os.path.join(os.pardir, 'VERSION')
+with open(VERSION_FILE) as fv:
+    version = fv.read().strip()
 
 
 # -- General configuration ---------------------------------------------------
