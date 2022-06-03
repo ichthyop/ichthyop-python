@@ -3,14 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. only:: html
 
-.. image:: _static/logo-ichthyop.*
-   :width: 150 px
-   :align: center
+    .. image:: _static/logo-ichthyop.*
+       :width: 150 px
+       :align: center
 
-|
+    |
 
-Ichthyop's documentation
+
+Ichthyop Python package
 ====================================
 
 .. toctree::
@@ -18,6 +20,7 @@ Ichthyop's documentation
    :caption: Contents:
    :numbered:
 
+   start
    reading
    plotting
    api

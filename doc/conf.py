@@ -18,7 +18,7 @@ import os
 
 # -- Project information -----------------------------------------------------
 
-project = 'Ichthyop'
+project = 'Ichthyop Python package'
 copyright = '2020, Nicolas Barrier'
 author = 'Nicolas Barrier'
 
@@ -42,7 +42,6 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.githubpages',
     'sphinxcontrib.bibtex',
-    #'sphinxcontrib.video',
     'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
