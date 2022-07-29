@@ -1,7 +1,9 @@
+''' Module for density computation '''
+
 import numpy as np
 import pylab as plt
-import read 
-import plot
+from . import read 
+from . import plot
 import xarray as xr
 
 def compute_density(data, nlon=30, nlat=30, zone=None):

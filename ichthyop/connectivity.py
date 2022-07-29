@@ -3,9 +3,9 @@ import numpy as np
 from matplotlib import path
 from matplotlib.patches import Polygon
 import xarray as xr
-import plot
-import shape
-import read
+from . import plot
+from . import shape
+from . import read
 
 def compute_connectivity(data, release, retention, release_names=None):
 

@@ -3,9 +3,9 @@ import pylab as plt
 from matplotlib import path
 from matplotlib.patches import Polygon
 import xarray as xr
-import plot
-import shape
-import read
+from . import plot
+from . import shape
+from . import read
 
 def extract_connected_traj(data, release, retention, release_names=None):
 
