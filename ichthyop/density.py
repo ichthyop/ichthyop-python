@@ -92,12 +92,11 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
             # loop over the indexes and update of the density
             for ii, ij in zip(lontemp[inzone], lattemp[inzone]):
                 density[itime, indzone, ij, ii] += 1
-
-
+    
     # creation of a dataset for saving it
     output = xr.Dataset({'density':(['time', 'zone', 'lat', 'lon'], density)},
                           coords={'lon':(['lon'], lonout), 'lat':(['lat'], latout),
-                              'time':(['time'], date), 'zone':(['zone'], zonelist)})
+                              'time': date, 'zone':(['zone'], zonelist)})
 
     # if the data array as only one zone, it is removed.
     output = output.squeeze(drop=True)
