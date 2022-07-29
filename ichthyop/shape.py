@@ -228,7 +228,7 @@ def read_shapefile(filename):
     output = []
 
     # loop over the shapes
-    for ishape in xrange(nshapes):
+    for ishape in range(nshapes):
         # extract the points coordinates and
         # converts from (lon1, lat1)... to lon and lat
         points = shapes[ishape].points

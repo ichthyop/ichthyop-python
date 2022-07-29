@@ -67,7 +67,7 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
     density = np.zeros((ntime, nzones, nlat, nlon), dtype=np.float)
 
     # loop over time
-    for itime in xrange(0, ntime):
+    for itime in range(0, ntime):
 
         # extract the indexes of the drifters at the current time 
         # step
@@ -84,7 +84,7 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
         tempzone = zoneout[ialive]       # ndrifter_alive
 
         # loop over the different zones
-        for indzone in xrange(nzones):
+        for indzone in range(nzones):
 
             # extracts the indexes of the larvae that has beeen released in the current zone
             inzone = np.nonzero(tempzone == zonelist[indzone])[0]
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     ndrifter = data.dims['drifter']
     zone = np.zeros(ndrifter) - 999
 
-    for p in xrange(0, 3):
+    for p in range(0, 3):
         iok = np.nonzero((lon[0]>=lonzone[p]) & (lon[0]<=lonzone[p+1]))[0]
         zone[iok] = p
 

@@ -35,7 +35,7 @@ def compute_connectivity(data, release, retention, release_names=None):
             raise ValueError(message)
     else:
         # if not provided, it is constructed
-        release_names = ["relzone_%.3d" %k for k in xrange(0, nrel_zones)]
+        release_names = ["relzone_%.3d" %k for k in range(0, nrel_zones)]
         
     output = np.zeros((ntime, nret_zones, nrel_zones), dtype=np.int)
 
@@ -43,7 +43,7 @@ def compute_connectivity(data, release, retention, release_names=None):
     # and extracts the path objects
     path_ret = []
     retention_names = []
-    for iret in xrange(0, nret_zones):
+    for iret in range(0, nret_zones):
 
         # recover the coordinates of the retention zone
         retzone = retention[iret].name
@@ -56,7 +56,7 @@ def compute_connectivity(data, release, retention, release_names=None):
         retention_names.append(retzone)
 
     # loop over all the time steps
-    for itime in xrange(0, ntime):
+    for itime in range(0, ntime):
         
         # extracts coordinates and morta at the current time step
         lon = data.isel(time=itime)['lon'].values  # ndrifter
@@ -74,7 +74,7 @@ def compute_connectivity(data, release, retention, release_names=None):
         list_of_points = np.array([lon, lat]).T   # ndrifter_ok, 2
 
         # loop over each retention zone
-        for iret in xrange(0, nret_zones):
+        for iret in range(0, nret_zones):
 
             # recovers the path that is currently processed
             temppath = path_ret[iret]
@@ -93,7 +93,7 @@ def compute_connectivity(data, release, retention, release_names=None):
 
             # loop over the release zones, and sum the number of points released from the zone
             # which are within the retention zones
-            for irel in xrange(0, nrel_zones):
+            for irel in range(0, nrel_zones):
                 itemp = np.nonzero(zonetemp[idrift] == irel)[0]
                 output[itime, iret, irel] = np.sum(mask[itemp])
     
@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
     print(lon.shape, lat.shape)
 
-    for p in xrange(0, 3):
+    for p in range(0, 3):
         iok = np.nonzero((lon[0]>=lonzone[p]) & (lon[0]<=lonzone[p+1]))[0]
         zone[iok] = p
 
