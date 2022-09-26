@@ -17,7 +17,7 @@ def compute_connectivity(data, release, retention, release_names=None):
     # check release argument is of length ndrifter
     if len(release) != ndrifter:
         message = 'The number of elements in the release arguments must'
-        message += ' be equal to ndrifer=%d.' %ndrifer
+        message += ' be equal to ndrifer=%d.' %ndrifter
         raise ValueError(message)
     
     # count the number of retention zones
@@ -65,7 +65,6 @@ def compute_connectivity(data, release, retention, release_names=None):
         
         # extract alive organisms
         ialive = np.nonzero(morta == 0)[0]
-        ialive = np.nonzero(morta >= 0)[0]
         lon = lon[ialive]  # ndrifter_ok
         lat = lat[ialive]  # ndrifter_ok
         zonetemp = zone[ialive]   # ndrifter_ok
