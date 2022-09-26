@@ -62,14 +62,14 @@ def compute_connectivity(data, retention):
         path_input = [(xtemp, ytemp) for xtemp, ytemp in zip(lonret, latret)]
         path_ret.append(path.Path(path_input))
         retention_names.append(retzone)
-
+        
     # loop over all the time steps
     for itime in range(0, ntime):
 
         # extracts coordinates and morta at the current time step
         lon = data.isel(time=itime)['lon'].values  # ndrifter
         lat = data.isel(time=itime)['lat'].values  # ndrifter
-        morta = data.isel(time=itime)['lat'].values   # ndrifter
+        morta = data.isel(time=itime)['mortality'].values   # ndrifter
 
         # extract alive organisms
         ialive = np.nonzero(morta == 0)[0]
