@@ -27,7 +27,7 @@ def process_release_zones(data):
     return zoneout
 
 
-def compute_connectivity(data, retention):
+def compute_connectivity(data, retention=None):
 
     data = data.copy()
 
@@ -39,7 +39,8 @@ def compute_connectivity(data, retention):
     nrel_zones = len(release_zones)
     zone = data['release_zone'].values
     
-    if retention == 'release':
+    if retention is None:
+        print('No retention zone provided. Asssumes same as release zones')
         retention = release_zones
 
     # count the number of retention zones
@@ -52,7 +53,7 @@ def compute_connectivity(data, retention):
     path_ret = []
     retention_names = []
     for iret in range(0, nret_zones):
-
+        
         # recover the coordinates of the retention zone
         retzone = retention[iret].name
         lonret = retention[iret].values[:, 1]
@@ -82,7 +83,7 @@ def compute_connectivity(data, retention):
 
         # loop over each retention zone
         for iret in range(0, nret_zones):
-
+            
             # recovers the path that is currently processed
             temppath = path_ret[iret]
 
@@ -94,7 +95,7 @@ def compute_connectivity(data, retention):
             # extracting of the bounding box in order to prevent a huge loop on points
             # far from the zone
             idrift = np.nonzero((lon>=lonmin) & (lon<=lonmax) & (lat>=latmin) & (lat<=latmax))[0]
-
+            
             # determines wheter the drifters are within the retention zone or not
             mask = temppath.contains_points(list_of_points[idrift])  # ndrifter_ok
 
