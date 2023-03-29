@@ -6,6 +6,7 @@
     "license": "other-open",
     "upload_type": "software",
     "description" : "",
+    "notes": "If you use this software, please cite it as below.",
     "related_identifiers": [
         {
             "scheme": "url",
