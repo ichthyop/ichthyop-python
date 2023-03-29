@@ -1,23 +1,5 @@
 {
-    "publication_date": "2023-02-28",
     "title": "Ichthyop Python package",
-    "version": "1.0.2",
-    "related_identifiers": [
-        {
-            "scheme": "url",
-            "identifier": "https://github.com/ichthyop/ichthyop-python/tree/1.0.2",
-            "relation": "isSupplementTo"
-        },
-        {
-            "scheme": "doi",
-            "identifier": "10.5281/zenodo.4109869",
-            "relation": "isVersionOf"
-        }
-    ],
-    "access_right": "open",
-    "license": "other-open",
-    "upload_type": "software",
-    "description" : "",
     "notes": "If you use this software, please cite it as below.",
     "creators": [
         {
