@@ -11,7 +11,7 @@ Plotting
 Drawing trajectories
 ----------------------------
 
-The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj` function. 
+The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj` function.
 
 .. ipython:: python
     :suppress:
@@ -20,7 +20,7 @@ The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj`
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "_static/examples/plot_dataset.py"
+    fpath = "doc/_static/examples/plot_dataset.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
     exec(code)
@@ -44,7 +44,7 @@ Movies
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "_static/examples/make_movie.py"
+    fpath = "doc/_static/examples/make_movie.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
     exec(code)
