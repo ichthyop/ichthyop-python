@@ -1,4 +1,5 @@
 {
     "esbonio.sphinx.confDir": "${workspaceFolder}/doc",
     "esbonio.sphinx.buildDir": "${confDir}/_build",
+    "scm.diffDecorationsIgnoreTrimWhitespace": "inherit",
 }

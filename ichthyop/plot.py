@@ -10,14 +10,14 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
 def plot_connectivity(data, figname):
-    
+
     """
     Draws the connectivity matrix. If it contains a
     :samp:`time` attribute, then temporal mean is performed
 
     :param xarray.Dataset data: Dataset obtained by the **compute_connectivity** function/
     :param str figname: Name of the output figure
-    
+
     """
 
     if 'time' in data.dims:
@@ -27,7 +27,7 @@ def plot_connectivity(data, figname):
 
     nret = data.dims['retention_zone']
     nrel = data.dims['release_zone']
-    
+
     # conversion of output into a numpy array
     output = data['connectivity'].values
 
@@ -56,7 +56,7 @@ def plot_connectivity(data, figname):
 
 def plot_traj(data, color='black', size=5, alpha=1):
 
-    """ 
+    """
     Plots the trajectories given a certain basemap.
     Used to avoid redefining the basemap in the drawing of
     movies.
@@ -71,11 +71,11 @@ def plot_traj(data, color='black', size=5, alpha=1):
         Idea: add the variable in the data array and then keep going
 
     """
-    
+
     # number of drifts and time steps
     ndrift = data.dims['drifter']
     ntime = data.dims['time']
-    
+
     # add the colorbar
     addcbar = True
 
@@ -85,9 +85,10 @@ def plot_traj(data, color='black', size=5, alpha=1):
         addcbar = False
         # default scatter value
         cvalue = color
+        cmapname = None
 
     else:
-
+        cmapname = plt.rcParams['image.cmap']
         cvalue = data[color].values
         # if one dimensional
         if cvalue.ndim == 1:
@@ -109,14 +110,14 @@ def plot_traj(data, color='black', size=5, alpha=1):
                     # dimensions are not good => everything drawn in black
                     cvalue = 'black'
                     addcbar = False
+                    cmapname = None
 
     # extracts the map coordinates coordinates
     x, y = data['lon'].values, data['lat'].values
-    cmapname = 'jet'
 
-    # if drifter defines the colormap, then we create a 
+    # if drifter defines the colormap, then we create a
     # discrete colormap
-    if color=='drifter':
+    if color == 'drifter':
 
         # recover the drifter values and stride
         drifter = data[color].values
@@ -127,12 +128,15 @@ def plot_traj(data, color='black', size=5, alpha=1):
         boundaries = [0.5*(drifter[i]+drifter[i+1]) for i in range(0, ncolors-1)]
         boundaries = [drifter[0] - dstride/2.] + boundaries + [drifter[-1] + dstride/2.]
 
-        # creation of the normalisation 
+        # creation of the normalisation
         norm = matplotlib.colors.BoundaryNorm(boundaries, ncolors=ncolors)
 
         # extraction of the colormap from the dictionnary and
         # creation of the discrete colormap
-        dictout = datad[cmapname] 
+        if cmapname in datad.keys():
+            dictout = datad[cmapname]
+        else:
+            dictout = datad['jet']
         cmap = LinearSegmentedColormap('', dictout, N=ncolors)
 
         # draws the scatter plot
@@ -148,9 +152,9 @@ def plot_traj(data, color='black', size=5, alpha=1):
             ticks = np.arange(drifter[0], drifter[-1], N*dstride)
         else:
             ticks = drifter
-        
+
         cb.set_ticks(ticks)
-    
+
     else:
         # draws the scatter plot
         cs = plt.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', cmap=cmapname, alpha=alpha, transform=ccrs.PlateCarree())
@@ -202,7 +206,7 @@ def map_traj(data, color='black', layout='lines', size=5):
 
 def make_movie(data, extent, dirout='./', layout='lines', size=5):
 
-    """ 
+    """
     Draws a series of :samp:`.png` files, containing
     the position of each drifter at a given time-step.
 
@@ -217,7 +221,7 @@ def make_movie(data, extent, dirout='./', layout='lines', size=5):
     """
 
     ntime = data.dims['time']
-   
+
     if 'date' in data:
         title = data['date'].values
     else:
