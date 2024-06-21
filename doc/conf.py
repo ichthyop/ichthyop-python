@@ -94,4 +94,4 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 #           ],
 #        }
 
-latex_documents = [('index', 'ichthyop-python-doc.pdf', project.replace(' ', '-'), author, 'manual')]
+latex_documents = [('index', 'ichthyop-python-doc.tex', f'{project} ({version})', author, 'manual')]
