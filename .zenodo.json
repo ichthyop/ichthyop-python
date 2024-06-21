@@ -1,0 +1,22 @@
+{
+    "title": "Ichthyop Python package",
+    "notes": "If you use this software, please cite it as below.",
+    "creators": [
+        {
+            "name": "Barrier, Nicolas",
+            "orcid": "0000-0002-1693-4719"
+        },
+        {
+            "name": "Lett, Christophe",
+            "orcid": "0000-0001-5809-2452"
+        }
+    ],
+    "communities": [
+        {
+            "identifier": "ichthyop"
+        },
+        {
+            "identifier": "umr-marbec"
+        }
+    ]
+}

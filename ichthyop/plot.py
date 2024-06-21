@@ -1,22 +1,23 @@
 
 """ Module for plotting Ichthyop outputs """
 
-from mpl_toolkits.basemap import Basemap
 import pylab as plt
 import numpy as np
 import matplotlib.colors
 from matplotlib._cm import datad
 from matplotlib.colors import LinearSegmentedColormap
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 def plot_connectivity(data, figname):
-    
+
     """
     Draws the connectivity matrix. If it contains a
     :samp:`time` attribute, then temporal mean is performed
 
     :param xarray.Dataset data: Dataset obtained by the **compute_connectivity** function/
     :param str figname: Name of the output figure
-    
+
     """
 
     if 'time' in data.dims:
@@ -26,7 +27,7 @@ def plot_connectivity(data, figname):
 
     nret = data.dims['retention_zone']
     nrel = data.dims['release_zone']
-    
+
     # conversion of output into a numpy array
     output = data['connectivity'].values
 
@@ -53,45 +54,14 @@ def plot_connectivity(data, figname):
     plt.close(fig)
 
 
-def extract_bmap(data, **dictbmap):
+def plot_traj(data, color='black', size=5, alpha=1):
 
     """
-    Extracts a Basemap from a dataset
-    containing both :samp:`lon` and :samp:`lat` coordinates, and possible additional
-    Basemap arguments. If the bounding boxes are not provided (:samp:`llcrnrlon`, etc.)
-    then the dataset limits are considered.
-
-    :param xarray.Dataset data: Input dataset
-    :param dict dictbmap: Additional basemap arguments
-
-    :return: A :py:class:`mpl_toolkits.basemap.Basemap` object
-    
-    """ 
-    
-    if 'llcrnrlon' not in dictbmap:
-        dictbmap['llcrnrlon'] = data['lon'].min().values
-    if 'llcrnrlat' not in dictbmap:
-        dictbmap['llcrnrlat'] = data['lat'].min().values
-    if 'urcrnrlon' not in dictbmap:
-        dictbmap['urcrnrlon'] = data['lon'].max().values
-    if 'urcrnrlat' not in dictbmap:
-        dictbmap['urcrnrlat'] = data['lat'].max().values
-    
-    # init bmap and draws map background
-    bmap = Basemap(**dictbmap)
-
-    return bmap
-
-
-def plot_traj(data, bmap, color='black', size=5, alpha=1):
-
-    """ 
     Plots the trajectories given a certain basemap.
     Used to avoid redefining the basemap in the drawing of
     movies.
 
     :param xarray data: Input dataset
-    :param Basemap basemap: Basemap object
     :param str color: Color used in the scatter plot
     :param int size: Size points
     :param float alpha: Transparency (1=full, 0=transparent)
@@ -101,11 +71,11 @@ def plot_traj(data, bmap, color='black', size=5, alpha=1):
         Idea: add the variable in the data array and then keep going
 
     """
-    
+
     # number of drifts and time steps
     ndrift = data.dims['drifter']
     ntime = data.dims['time']
-    
+
     # add the colorbar
     addcbar = True
 
@@ -115,9 +85,10 @@ def plot_traj(data, bmap, color='black', size=5, alpha=1):
         addcbar = False
         # default scatter value
         cvalue = color
+        cmapname = None
 
     else:
-
+        cmapname = plt.rcParams['image.cmap']
         cvalue = data[color].values
         # if one dimensional
         if cvalue.ndim == 1:
@@ -139,14 +110,14 @@ def plot_traj(data, bmap, color='black', size=5, alpha=1):
                     # dimensions are not good => everything drawn in black
                     cvalue = 'black'
                     addcbar = False
+                    cmapname = None
 
     # extracts the map coordinates coordinates
-    x, y = bmap(data['lon'].values, data['lat'].values)
-    cmapname = 'jet'
+    x, y = data['lon'].values, data['lat'].values
 
-    # if drifter defines the colormap, then we create a 
+    # if drifter defines the colormap, then we create a
     # discrete colormap
-    if color=='drifter':
+    if color == 'drifter':
 
         # recover the drifter values and stride
         drifter = data[color].values
@@ -157,19 +128,22 @@ def plot_traj(data, bmap, color='black', size=5, alpha=1):
         boundaries = [0.5*(drifter[i]+drifter[i+1]) for i in range(0, ncolors-1)]
         boundaries = [drifter[0] - dstride/2.] + boundaries + [drifter[-1] + dstride/2.]
 
-        # creation of the normalisation 
+        # creation of the normalisation
         norm = matplotlib.colors.BoundaryNorm(boundaries, ncolors=ncolors)
 
         # extraction of the colormap from the dictionnary and
         # creation of the discrete colormap
-        dictout = datad[cmapname] 
+        if cmapname in datad.keys():
+            dictout = datad[cmapname]
+        else:
+            dictout = datad['jet']
         cmap = LinearSegmentedColormap('', dictout, N=ncolors)
 
         # draws the scatter plot
-        cs = bmap.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', norm=norm, cmap=cmap, alpha=alpha)
+        cs = plt.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', norm=norm, cmap=cmap, alpha=alpha, transform=ccrs.PlateCarree())
 
         # add the colorbar
-        cb = bmap.colorbar(cs)
+        cb = plt.colorbar(cs, orientation='horizontal')
         cb.set_label(color)
 
         nmax = 11
@@ -178,20 +152,20 @@ def plot_traj(data, bmap, color='black', size=5, alpha=1):
             ticks = np.arange(drifter[0], drifter[-1], N*dstride)
         else:
             ticks = drifter
-        
+
         cb.set_ticks(ticks)
-    
+
     else:
         # draws the scatter plot
-        cs = bmap.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', cmap=cmapname, alpha=alpha)
+        cs = plt.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', cmap=cmapname, alpha=alpha, transform=ccrs.PlateCarree())
 
         if addcbar:
             # add the colorbar if necessary
-            cb = bmap.colorbar(cs)
+            cb = plt.colorbar(cs, orientation='horizontal')
             cb.set_label(color)
 
 
-def map_traj(data, color='black', layout='lines', size=5, **dictbmap):
+def map_traj(data, color='black', layout='lines', size=5):
 
     """
     Draws the Ichthyop trajectories on a map.
@@ -202,12 +176,11 @@ def map_traj(data, color='black', layout='lines', size=5, **dictbmap):
     :param str layout: Map layout ('filled' for filled continents, 'etopo'
      for ETOPO map background, 'lines' for coastlines).
     :param int size: Size of the dots in the scatter plot
-    :param dict dictbmap: Additional arguments of the 
-     :py:class:`mpl.toolkits.basemap.Basemap` constructor.
+    :param dict projection: Cartopy Projection (crs object). If None, PlateCarree()
 
     """
 
-    bmap = extract_bmap(data, **dictbmap)
+    ax = plt.gca()
 
     # number of drifts and time steps
     ndrift = data.dims['drifter']
@@ -220,20 +193,20 @@ def map_traj(data, color='black', layout='lines', size=5, **dictbmap):
         print(message)
 
     if layout == 'filled':
-        bmap.fillcontinents(color='lightgray')
-        bmap.drawcoastlines(linewidth=0.5)
+        ax.add_feature(cfeature.LAND, color='lightgray')
+        ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
     elif layout == 'etopo':
-        bmap.etopo()
-    else:
-        bmap.drawcoastlines(linewidth=0.5)
+        ax.stock_img()
+    elif layout == 'coastline':
+        ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
 
     # plot the trajectory
-    plot_traj(data, bmap, color, size)
+    plot_traj(data, color, size)
 
 
-def make_movie(data, layout='lines', size=5, **dictbmap):
+def make_movie(data, extent, dirout='./', layout='lines', size=5):
 
-    """ 
+    """
     Draws a series of :samp:`.png` files, containing
     the position of each drifter at a given time-step.
 
@@ -242,36 +215,33 @@ def make_movie(data, layout='lines', size=5, **dictbmap):
     ffmpeg or mencoder.
 
     :param xarray.Dataset data: The input dataset
+    :param list extent: Geographical extent [lonmin, lonmax, latmin, latmax]
     :param str layout: The map background ('lines', 'fill' or 'etopo')
     :param int size: The dot size
-    :param dict dictbmap: Additional arguments for the map definition
     """
 
     ntime = data.dims['time']
 
-    bmap = extract_bmap(data, **dictbmap)
-   
     if 'date' in data:
         title = data['date'].values
     else:
         title = data['time'].values
-    
-    if layout == 'filled':
-        layfunc = bmap.fillcontinents
-        layargs = {'color':'lightgray'}
-    elif layout == 'etopo':
-        layfunc = bmap.etopo
-        layargs = {}
-    else:
-        layfunc = bmap.drawcoastlines
-        layargs = {'linewidth': 0.5}
 
-    for it in xrange(0, ntime):
+    if layout == 'filled':
+        layfunc = lambda ax : ax.add_feature(cfeature.LAND, facecolor='gray')
+    elif layout == 'etopo':
+        layfunc = lambda ax : ax.stock_img()
+    else:
+        layfunc = lambda ax : ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
+
+    for it in range(0, ntime):
         temp = data.isel(time=slice(0, it+1))
 
         fig = plt.figure()
-        layfunc(**layargs)
-        plot_traj(temp, bmap, 'drifter', size=size)
+        ax = plt.axes(projection = ccrs.PlateCarree())
+        layfunc(ax)
+        ax.set_extent(extent)
+        plot_traj(temp, 'drifter', size=size)
         plt.title(title[it])
-        plt.savefig('temp_%.5d' %it, bbox_inches='tight')
+        plt.savefig('%s/temp_%.5d' %(dirout, it), bbox_inches='tight')
         plt.close(fig)

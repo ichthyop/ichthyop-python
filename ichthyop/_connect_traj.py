@@ -3,9 +3,9 @@ import pylab as plt
 from matplotlib import path
 from matplotlib.patches import Polygon
 import xarray as xr
-import plot
-import shape
-import read
+from . import plot
+from . import shape
+from . import read
 
 def extract_connected_traj(data, release, retention, release_names=None):
 
@@ -35,13 +35,13 @@ def extract_connected_traj(data, release, retention, release_names=None):
             raise ValueError(message)
     else:
         # if not provided, it is constructed
-        release_names = ["relzone_%.3d" %k for k in xrange(0, nrel_zones)]
+        release_names = ["relzone_%.3d" %k for k in range(0, nrel_zones)]
         
     # loop over each retention zone
     # and extracts the path objects
     path_ret = []
     retention_names = []
-    for iret in xrange(0, nret_zones):
+    for iret in range(0, nret_zones):
 
         # recover the coordinates of the retention zone
         retzone = retention[iret].name
@@ -56,7 +56,7 @@ def extract_connected_traj(data, release, retention, release_names=None):
     outputbis = np.zeros((ntime, ndrifter))
 
     # loop over all the time steps
-    for itime in xrange(0, ntime):
+    for itime in range(0, ntime):
         
         # extracts coordinates and morta at the current time step
         lon = data.isel(time=itime)['lon'].values  # ndrifter
@@ -74,7 +74,7 @@ def extract_connected_traj(data, release, retention, release_names=None):
         list_of_points = np.array([lon, lat]).T   # ndrifter_ok, 2
 
         # loop over each retention zone
-        for iret in xrange(0, nret_zones):
+        for iret in range(0, nret_zones):
 
             # recovers the path that is currently processed
             temppath = path_ret[iret]
@@ -84,7 +84,7 @@ def extract_connected_traj(data, release, retention, release_names=None):
 
             # loop over the release zones, and sum the number of points released from the zone
             # which are within the retention zones
-            for irel in xrange(0, nrel_zones):
+            for irel in range(0, nrel_zones):
                 # if release name is different from retention name
                 if release_names[irel] != retention_names[iret]:
                     
@@ -116,19 +116,19 @@ if __name__ == '__main__':
     ndrifter = data.dims['drifter']
     zone = np.zeros(ndrifter) - 999
 
-    print lon.shape, lat.shape
+    print(lon.shape, lat.shape)
 
-    for p in xrange(0, 3):
+    for p in range(0, 3):
         iok = np.nonzero((lon[0]>=lonzone[p]) & (lon[0]<=lonzone[p+1]))[0]
         zone[iok] = p
 
     data['zone'] = (['drifter'], zone)
   
-    print np.unique(zone)
+    print(np.unique(zone))
 
     ret = []
     retzone = shape.Shape([0., 1, 1, 0], [37.5, 37.5, 39, 39], 'toto', 'rec')
-    print retzone
+    print(retzone)
     retzone.longitude += -0.5
     retzone.latitude += 1
     ret.append(retzone)
@@ -144,9 +144,9 @@ if __name__ == '__main__':
         plt.gca().add_patch(polygon)
     
     output = extract_connected_traj(data, zone, ret)
-    print data
+    print(data)
     data = data.isel(drifter=output)
-    print data
+    print(data)
     plot.map_traj(data, color='zone', suppress_ticks=0, resolution='i')
     #plot.map_traj(data.isel(drifter=output), color='k', suppress_ticks=0, resolution='i')
     

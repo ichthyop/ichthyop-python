@@ -1,8 +1,9 @@
+''' Module for density computation '''
+
 import numpy as np
 import pylab as plt
-from mpl_toolkits.basemap import Basemap
-import read 
-import plot
+from . import read 
+from . import plot
 import xarray as xr
 
 def compute_density(data, nlon=30, nlat=30, zone=None):
@@ -41,8 +42,8 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
     # to understand this formulae. simply keep in mind that lat is a linear function of index,
     # same for longitude
     # this is done here so that the "big" lonout/latout arrays are manipulated only once.
-    indexlon = np.round((len(lonout) - 1) * (data['lon'] - lonout[0]) / (lonout[-1] - lonout[0]))
-    indexlat = np.round((len(latout) - 1) * (data['lat'] - latout[0]) / (latout[-1] - latout[0]))
+    indexlon = np.floor((len(lonout) - 1) * (data['lon'] - lonout[0]) / (lonout[-1] - lonout[0]))
+    indexlat = np.floor((len(latout) - 1) * (data['lat'] - latout[0]) / (latout[-1] - latout[0]))
 
     # conversion into int (obligatory to use as numpy index)
     indexlon = indexlon.astype(np.int)    # ntime, ndrifter
@@ -66,7 +67,7 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
     density = np.zeros((ntime, nzones, nlat, nlon), dtype=np.float)
 
     # loop over time
-    for itime in xrange(0, ntime):
+    for itime in range(0, ntime):
 
         # extract the indexes of the drifters at the current time 
         # step
@@ -83,7 +84,7 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
         tempzone = zoneout[ialive]       # ndrifter_alive
 
         # loop over the different zones
-        for indzone in xrange(nzones):
+        for indzone in range(nzones):
 
             # extracts the indexes of the larvae that has beeen released in the current zone
             inzone = np.nonzero(tempzone == zonelist[indzone])[0]
@@ -91,12 +92,11 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
             # loop over the indexes and update of the density
             for ii, ij in zip(lontemp[inzone], lattemp[inzone]):
                 density[itime, indzone, ij, ii] += 1
-
-
+    
     # creation of a dataset for saving it
     output = xr.Dataset({'density':(['time', 'zone', 'lat', 'lon'], density)},
                           coords={'lon':(['lon'], lonout), 'lat':(['lat'], latout),
-                              'time':(['time'], date), 'zone':(['zone'], zonelist)})
+                              'time': date, 'zone':(['zone'], zonelist)})
 
     # if the data array as only one zone, it is removed.
     output = output.squeeze(drop=True)
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     # extracts the first time step
     data = read.extract_dataset(filename, tmin=0, tmax=10)
     dens = compute_density(data)
-    print dens
+    print(dens)
     
 
     lonmin = data['lon'].min().values
@@ -121,12 +121,11 @@ if __name__ == '__main__':
     ndrifter = data.dims['drifter']
     zone = np.zeros(ndrifter) - 999
 
-    for p in xrange(0, 3):
+    for p in range(0, 3):
         iok = np.nonzero((lon[0]>=lonzone[p]) & (lon[0]<=lonzone[p+1]))[0]
         zone[iok] = p
 
     dens = compute_density(data, zone=zone)
-    print dens
     
     """
 

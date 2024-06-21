@@ -4,7 +4,7 @@ Module for reading of Ichthyop outputs
 
 import xarray as xr
 import numpy as np
-from cftime import utime
+import cftime
 import re
 
 def extract_dataset(filename, dmin=None, dmax=None, dstride=None, tmin=None, tmax=None, tstride=None):
@@ -139,10 +139,7 @@ def extract_date(data, units=None, calendar=None):
     
         calendar = data['time'].calendar
 
-    # creation of the utime object for time conversion
-    cdftime = utime(units, calendar)
-
     # calculation of date, and adding of the date to
     # the dataset
-    date = cdftime.num2date(data['time'])
+    date = cftime.num2date(data['time'], units, calendar)
     data['time'] = date
