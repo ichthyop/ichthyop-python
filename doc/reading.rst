@@ -25,7 +25,7 @@ If all these arguments are set to :samp:`None`, the entire dataset is read.
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "doc/_static/examples/read_dataset.py"
+    fpath = "_static/examples/read_dataset.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
         exec(code)
@@ -55,7 +55,7 @@ Note that this function overwrites the original :samp:`time` coordinates in nume
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "doc/_static/examples/extract_date.py"
+    fpath = "_static/examples/extract_date.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
         exec(code)

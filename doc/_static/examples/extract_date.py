@@ -2,7 +2,7 @@ import ichthyop.read as ichread
 import ichthyop.plot as ichplot
 import pylab as plt
 
-filename = 'doc/_static/ichthyop-example.nc'
+filename = '_static/ichthyop-example.nc'
 #filename = '../_static/ichthyop-example.nc'
 
 # extracts the trajectories of drifters numbers with a step of 1000
