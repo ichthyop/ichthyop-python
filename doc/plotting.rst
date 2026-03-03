@@ -15,12 +15,13 @@ The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj`
 
 .. ipython:: python
     :suppress:
+    :okwarning:
 
     import os
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "_static/examples/plot_dataset.py"
+    fpath = "doc/_static/examples/plot_dataset.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
     exec(code)
@@ -39,18 +40,20 @@ Movies
 
 .. ipython:: python
     :suppress:
+    :okwarning:
 
     import os
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "_static/examples/make_movie.py"
+    fpath = "doc/_static/examples/make_movie.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
     exec(code)
 
 .. ipython:: python
     :suppress:
+    :okwarning:
 
     import os
     import subprocess
@@ -83,7 +86,7 @@ The :samp:`-y` option allows overwritting without asking, the :samp:`-framerate`
 
     <div>
         <video width="500"  controls>
-            <source src="_static/movie.ogg" type="video/ogg">
+            <source src="doc/_static/movie.ogg" type="video/ogg">
             Video
         </video>
     </div>

@@ -1,6 +1,6 @@
 import ichthyop.read as ichread
 
-filename = '_static/ichthyop-example.nc'
+filename = 'doc/_static/ichthyop-example.nc'
 
 # read the entire dataset
 data_all = ichread.extract_dataset(filename)

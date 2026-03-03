@@ -20,12 +20,13 @@ If all these arguments are set to :samp:`None`, the entire dataset is read.
 
 .. ipython:: python
     :suppress:
+    :okwarning:
 
     import os
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "_static/examples/read_dataset.py"
+    fpath = "doc/_static/examples/read_dataset.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
         exec(code)
@@ -50,12 +51,13 @@ Note that this function overwrites the original :samp:`time` coordinates in nume
 
 .. ipython:: python
     :suppress:
+    :okwarning:
 
     import os
     cwd = os.getcwd()
     print(cwd)
 
-    fpath = "_static/examples/extract_date.py"
+    fpath = "doc/_static/examples/extract_date.py"
     with open(fpath) as f:
         code = compile(f.read(), fpath, 'exec')
         exec(code)
