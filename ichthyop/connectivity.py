@@ -7,17 +7,26 @@ import xarray as xr
 from . import plot
 from . import shape
 from . import read
+from . import zone as _zone
 
 def process_release_zones(data):
 
+    # Extract the release zone variable
     release_zones = data['release_zone']
+
+    # Extract the attribute that contains the name of each zone.
+    # Attributes with the names are:
+    # release_zone_X with X the index of the release zone
     attrs = [v for v in release_zones.attrs if v.startswith('release_zone_')]
 
+    # Here we extract the **value** of the attribute, i.e.
+    # the release zone name
     zone_names = []
     for i in range(0, len(attrs)):
         temp = release_zones.attrs['release_zone_%d' %i]
         zone_names.append(temp)
-    
+
+    # Here, we extract the zone coordinate
     zoneout = []
     for i in range(len(attrs)):
         temp = data['coord_geo_zone%s' %i]
@@ -27,43 +36,105 @@ def process_release_zones(data):
     return zoneout
 
 
-def compute_connectivity(data, retention=None):
+"""
+    Computes the connectivity matrix from the Ichthyop recruitment and release output variables.
+    This method is faster and strongly recommended
+"""
+def compute_connectivity_from_file(data):
 
-    data = data.copy()
+    ntime = data.sizes['time']
+    ndrifter = data.sizes['drifter']
 
-    ntime = data.dims['time']
-    ndrifter = data.dims['drifter']
+    zones = _zone.parse_zones(data)
+    release_zones = [z for z in zones if z.type == 'release']
+    release_names = [z.name for z in release_zones]
 
-    release_zones = process_release_zones(data)
-    release_names = [zone.name for zone in release_zones]
+
+    ret_zones = [z for z in zones if z.type == 'recruitment']
+    target_zones = [z for z in zones if z.type == 'target']
+    recruitment_zones = ret_zones + target_zones
+    recruitment_zones_names = [z.name for z in recruitment_zones]
+
+    # Extract the recruitment value for each zone
+    # dimension = ntime, ndrifter, nrecruitment zone
+    recruited_zone = data['recruited_zone']
+
+    nret_zones = len(recruitment_zones)
     nrel_zones = len(release_zones)
+
+    # one value per drifter, i.e. index of the
+    # release zone
+    release_zone = data['release_zone'].values
+
+    output = np.zeros((ntime, nret_zones, nrel_zones), dtype=int)
+    for relzone in np.unique(release_zone):
+        print(relzone)
+        # extract the list of drifters that have been released in the given zone
+        idrifter = np.nonzero(release_zone == relzone)[0]
+        print(idrifter)
+
+        # Sum the recrutment values for these drifters
+        output[:, :, relzone] = recruited_zone.isel(drifter=idrifter).sum(dim='drifter').values
+
+    # creation of a dataset for saving it
+    output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
+                          coords={'release_zone':(['release_zone'], release_names),
+                                  'retention_zone':(['retention_zone'], recruitment_zones_names),
+                                  'time': data['time']})
+    return output
+
+
+"""
+    Computes the connectivity matrix from the Ichthyop trajectories (i.e. longitude and latitude)
+    This method is slower but can be used to assess connectivity matrix based on manually defined
+    release and target zones.
+"""
+def compute_connectivity_from_traj(data, release_zones=None, recruitment_zones=None):
+
+    ntime = data.sizes['time']
+    ndrifter = data.sizes['drifter']
+
+    zones = _zone.parse_zones(data)
+
+    if(release_zones is None):
+        release_zones = [z for z in zones if z.type == 'release']
+    nrel_zones = len(release_zones)
+    release_names = [z.name for z in release_zones]
+
+    if recruitment_zones is None:
+        ret_zones = [z for z in zones if z.type == 'recruitment']
+        target_zones = [z for z in zones if z.type == 'target']
+        recruitment_zones = ret_zones + target_zones
+
+    # count the number of recruitment_zones zones
+    nret_zones = len(recruitment_zones)
+
     zone = data['release_zone'].values
-    
-    if retention is None:
+
+    if recruitment_zones == 'release':
         print('No retention zone provided. Asssumes same as release zones')
-        retention = release_zones
+        recruitment_zones = release_zones
+    else:
+        recruitment_zones = ret_zones + target_zones
 
-    # count the number of retention zones
-    nret_zones = len(retention)
+    output = np.zeros((ntime, nret_zones, nrel_zones), dtype=int)
 
-    output = np.zeros((ntime, nret_zones, nrel_zones), dtype=np.int)
-
-    # loop over each retention zone
+    # loop over each recruitment_zones zone
     # and extracts the path objects
     path_ret = []
-    retention_names = []
+    recruitment_zones_names = []
     for iret in range(0, nret_zones):
-        
-        # recover the coordinates of the retention zone
-        retzone = retention[iret].name
-        lonret = retention[iret].values[:, 1]
-        latret = retention[iret].values[:, 0]
 
-        # Conversion of retention lat/lon into a proper path object
+        # recover the coordinates of the recruitment_zones zone
+        retzone = recruitment_zones[iret].name
+        lonret = recruitment_zones[iret].lon
+        latret = recruitment_zones[iret].lat
+
+        # Conversion of recruitment_zones lat/lon into a proper path object
         path_input = [(xtemp, ytemp) for xtemp, ytemp in zip(lonret, latret)]
         path_ret.append(path.Path(path_input))
-        retention_names.append(retzone)
-        
+        recruitment_zones_names.append(retzone)
+
     # loop over all the time steps
     for itime in range(0, ntime):
 
@@ -83,7 +154,7 @@ def compute_connectivity(data, retention=None):
 
         # loop over each retention zone
         for iret in range(0, nret_zones):
-            
+
             # recovers the path that is currently processed
             temppath = path_ret[iret]
 
@@ -95,7 +166,7 @@ def compute_connectivity(data, retention=None):
             # extracting of the bounding box in order to prevent a huge loop on points
             # far from the zone
             idrift = np.nonzero((lon>=lonmin) & (lon<=lonmax) & (lat>=latmin) & (lat<=latmax))[0]
-            
+
             # determines wheter the drifters are within the retention zone or not
             mask = temppath.contains_points(list_of_points[idrift])  # ndrifter_ok
 
@@ -108,7 +179,7 @@ def compute_connectivity(data, retention=None):
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
                           coords={'release_zone':(['release_zone'], release_names),
-                                  'retention_zone':(['retention_zone'], retention_names),
+                                  'retention_zone':(['retention_zone'], recruitment_zones_names),
                                   'time': data['time']})
 
     return output
