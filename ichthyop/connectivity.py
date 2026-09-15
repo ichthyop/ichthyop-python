@@ -67,7 +67,6 @@ def compute_connectivity_from_file(data, normalize=True):
 
     output = np.zeros((ntime, nret_zones, nrel_zones), dtype=int)
     for relzone in np.unique(release_zone):
-        print(relzone)
         # extract the list of drifters that have been released in the given zone
         idrifter = np.nonzero(release_zone == relzone)[0]
 
@@ -77,7 +76,7 @@ def compute_connectivity_from_file(data, normalize=True):
         if(normalize):
             # if normalize, we divide by the number of particles
             # released in the zone and provide the percentage
-            output[:, :, relzone] *= 100. / len(idrifter)
+            output[:, :, relzone] = output[:, :, relzone] * 100. / len(idrifter)
 
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
@@ -177,12 +176,12 @@ def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinat
             # which are within the retention zones
             for irel in range(0, nrel_zones):
                 itemp = np.nonzero(zonetemp[idrift] == irel)[0]
-                output[itime, iret, irel] = np.sum(mask[itemp])
+                output[itime, iret, irel] = np.sum(mask[itemp]).astype(float)
 
                 if normalize:
                     # If normalize, divide by the total number of particles
                     # released in the zone and returns percentage
-                    output[itime, iret, irel] *= 100 / nparticles_per_zone[irel]
+                    output[itime, iret, irel] = output[itime, iret, irel]  * 100. / nparticles_per_zone[irel]
 
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
@@ -219,7 +218,6 @@ if __name__ == '__main__':
     data['zone'] = zone
 
     plot.map_traj(data, color='zone', suppress_ticks=0, resolution='i')
-    print(np.unique(zone))
 
     ret = []
     retzone = shape.Shape([-1, 1, 1, -1], [37.5, 37.5, 39, 39], 'toto', 'rec')
