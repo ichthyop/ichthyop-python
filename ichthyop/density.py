@@ -6,7 +6,7 @@ from . import read
 from . import plot
 import xarray as xr
 
-def compute_density(data, nlon=30, nlat=30, zone=None):
+def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=None):
 
     '''
     Computes the density, i.e. the number of drifters, within each cell of a
@@ -35,12 +35,24 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
 
     date = data['time']
 
-    lonout = np.linspace(data['lon'].min(), data['lon'].max(), nlon)
-    latout = np.linspace(data['lat'].min(), data['lat'].max(), nlat)
+    if lon_lim is None:
+        lonmin = (data['lon'].min())
+        lonmax = (data['lon'].min())
+    else:
+        lonmin, lonmax = lon_lim
+
+    if lat_lim is None:
+        latmin = (data['lat'].min())
+        latmax = (data['lat'].min())
+    else:
+        latmin, latmax = lat_lim
+
+    lonout = np.linspace(lonmin, lonmax, nlon)
+    latout = np.linspace(latmin, latmax, nlat)
     dlon = np.diff(lonout).mean()
     dlat = np.diff(latout).mean()
-    lonout2 = np.arange(data['lon'].min() - 0.5*dlon, data['lon'].max() + dlon, dlon)
-    latout2 = np.arange(data['lat'].min() - 0.5*dlat, data['lat'].max() + dlat, dlat)
+    lonout2 = np.arange(lonmin - 0.5*dlon, lonmax + dlon, dlon)
+    latout2 = np.arange(latmin - 0.5*dlat, latmax + dlat, dlat)
 
     # Extracting the closest indexex of each cell
     # to understand this formulae. simply keep in mind that lat is a linear function of index,
