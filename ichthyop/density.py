@@ -49,8 +49,8 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
     indexlon = indexlon.astype(int)    # ntime, ndrifter
     indexlat = indexlat.astype(int)    # ntime, ndrifter
 
-    ntime = data.dims['time']
-    ndrifter = data.dims['drifter']
+    ntime = data.sizes['time']
+    ndrifter = data.sizes['drifter']
 
     if zone is not None:
         zoneout = np.array(zone)
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     lon = np.squeeze(data['lon'].values)
     lat = np.squeeze(data['lat'].values)
     lonzone = np.linspace(lonmin, lonmax, 4)
-    ndrifter = data.dims['drifter']
+    ndrifter = data.sizes['drifter']
     zone = np.zeros(ndrifter) - 999
 
     for p in range(0, 3):
