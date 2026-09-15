@@ -49,7 +49,6 @@ def compute_connectivity_from_file(data, normalize=True):
     release_zones = [z for z in zones if z.type == 'release']
     release_names = [z.name for z in release_zones]
 
-
     ret_zones = [z for z in zones if z.type == 'recruitment']
     target_zones = [z for z in zones if z.type == 'target']
     recruitment_zones = ret_zones + target_zones
@@ -71,7 +70,6 @@ def compute_connectivity_from_file(data, normalize=True):
         print(relzone)
         # extract the list of drifters that have been released in the given zone
         idrifter = np.nonzero(release_zone == relzone)[0]
-        print(idrifter)
 
         # Sum the recrutment values for these drifters
         output[:, :, relzone] = recruited_zone.isel(drifter=idrifter).sum(dim='drifter').values
@@ -79,7 +77,7 @@ def compute_connectivity_from_file(data, normalize=True):
         if(normalize):
             # if normalize, we divide by the number of particles
             # released in the zone and provide the percentage
-            output[:, :, relzone] /= len(idrifter) * 100
+            output[:, :, relzone] *= 100. / len(idrifter)
 
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
@@ -184,7 +182,7 @@ def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinat
                 if normalize:
                     # If normalize, divide by the total number of particles
                     # released in the zone and returns percentage
-                    output[itime, iret, irel] /= nparticles_per_zone[irel] * 100
+                    output[itime, iret, irel] *= 100 / nparticles_per_zone[irel]
 
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
