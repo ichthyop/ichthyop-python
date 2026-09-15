@@ -2,35 +2,35 @@
 
 import numpy as np
 import pylab as plt
-from . import read 
+from . import read
 from . import plot
 import xarray as xr
 
 def compute_density(data, nlon=30, nlat=30, zone=None):
-    
-    ''' 
+
+    '''
     Computes the density, i.e. the number of drifters, within each cell of a
     regular grid, the size of which is controlled by the user.
 
     .. code-block:: python
-        
+
         longrid = np.linspace(data['lon'].min(), data['lon'].max(), nlon)
         latgrid = np.linspace(data['lat'].min(), data['lat'].max(), nlat)
-    
+
     .. todo::
-        
+
         Same thing but on an irregular grid (NEMO for instance). But memory and slow
         computation time issues.
 
     :param xarray.Dataset data: Input dataset containing the trajectories
     :param int nlon: The number of longitudes in the regular grid
     :param int nlat: The number of latitudes in the regular grid
-    :param numpy.array: An index of size :samp:`ndrifter`, over which density 
+    :param numpy.array: An index of size :samp:`ndrifter`, over which density
      may be summed. It may be for index an index of release zones.
-    
+
     :return: A xarray.Dataset containing the coordinates of the regular grid
     and the density, and eventually the zone.
-    
+
     '''
 
     date = data['time']
@@ -46,8 +46,8 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
     indexlat = np.floor((len(latout) - 1) * (data['lat'] - latout[0]) / (latout[-1] - latout[0]))
 
     # conversion into int (obligatory to use as numpy index)
-    indexlon = indexlon.astype(np.int)    # ntime, ndrifter
-    indexlat = indexlat.astype(np.int)    # ntime, ndrifter
+    indexlon = indexlon.astype(int)    # ntime, ndrifter
+    indexlat = indexlat.astype(int)    # ntime, ndrifter
 
     ntime = data.dims['time']
     ndrifter = data.dims['drifter']
@@ -58,26 +58,26 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
             message = "The zone argument must be a 1D array of shape ndrifter"
             raise ValueError(message)
     else:
-        zoneout = np.zeros(ndrifter).astype(np.int)
+        zoneout = np.zeros(ndrifter).astype(int)
 
     zonelist = np.unique(zoneout)
     nzones = len(zonelist)
 
     # initialises the density array
-    density = np.zeros((ntime, nzones, nlat, nlon), dtype=np.float)
+    density = np.zeros((ntime, nzones, nlat, nlon), dtype=float)
 
     # loop over time
     for itime in range(0, ntime):
 
-        # extract the indexes of the drifters at the current time 
+        # extract the indexes of the drifters at the current time
         # step
         lontemp = indexlon[itime]   # ndrifter
         lattemp = indexlat[itime]   # ndrifter
         mortemp = data['mortality'][itime]  # ndrifter
-        
+
         # extracts only the indexes of alive larvae
         ialive = np.nonzero((mortemp == 0).values)[0]   # ndrifter_alive
-        
+
         # extracts the lon/lat of the alive larvae for the current time step
         lontemp = lontemp[ialive].values   # ndrifter_alive
         lattemp = lattemp[ialive].values   # ndrifter_alive
@@ -92,7 +92,7 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
             # loop over the indexes and update of the density
             for ii, ij in zip(lontemp[inzone], lattemp[inzone]):
                 density[itime, indzone, ij, ii] += 1
-    
+
     # creation of a dataset for saving it
     output = xr.Dataset({'density':(['time', 'zone', 'lat', 'lon'], density)},
                           coords={'lon':(['lon'], lonout), 'lat':(['lat'], latout),
@@ -100,18 +100,18 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
 
     # if the data array as only one zone, it is removed.
     output = output.squeeze(drop=True)
-    
+
     return output
 
 if __name__ == '__main__':
 
     filename = '../doc/source/_static/ichthyop-example.nc'
-    
+
     # extracts the first time step
     data = read.extract_dataset(filename, tmin=0, tmax=10)
     dens = compute_density(data)
     print(dens)
-    
+
 
     lonmin = data['lon'].min().values
     lonmax = data['lon'].max().values
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         zone[iok] = p
 
     dens = compute_density(data, zone=zone)
-    
+
     """
 
     # initialises the map by taking the lon/lat limits of larvae dispersions
