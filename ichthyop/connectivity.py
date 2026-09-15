@@ -40,7 +40,7 @@ def process_release_zones(data):
     Computes the connectivity matrix from the Ichthyop recruitment and release output variables.
     This method is faster and strongly recommended
 """
-def compute_connectivity_from_file(data):
+def compute_connectivity_from_file(data, normalize=True):
 
     ntime = data.sizes['time']
     ndrifter = data.sizes['drifter']
@@ -76,6 +76,11 @@ def compute_connectivity_from_file(data):
         # Sum the recrutment values for these drifters
         output[:, :, relzone] = recruited_zone.isel(drifter=idrifter).sum(dim='drifter').values
 
+        if(normalize):
+            # if normalize, we divide by the number of particles
+            # released in the zone and provide the percentage
+            output[:, :, relzone] /= len(idrifter) * 100
+
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
                           coords={'release_zone':(['release_zone'], release_names),
@@ -89,33 +94,33 @@ def compute_connectivity_from_file(data):
     This method is slower but can be used to assess connectivity matrix based on manually defined
     release and target zones.
 """
-def compute_connectivity_from_traj(data, release_zones=None, recruitment_zones=None):
+def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinates=None, recruitment_zones_coordinates=None):
 
     ntime = data.sizes['time']
     ndrifter = data.sizes['drifter']
 
-    zones = _zone.parse_zones(data)
+    # Parse the geographical extents of the zones
+    zones_coordinates = _zone.parse_zones(data)
 
-    if(release_zones is None):
-        release_zones = [z for z in zones if z.type == 'release']
-    nrel_zones = len(release_zones)
-    release_names = [z.name for z in release_zones]
+    if(release_zones_coordinates is None):
+        release_zones_coordinates = [z for z in zones_coordinates if z.type == 'release']
+    nrel_zones = len(release_zones_coordinates)
+    release_names = [z.name for z in release_zones_coordinates]
 
-    if recruitment_zones is None:
-        ret_zones = [z for z in zones if z.type == 'recruitment']
-        target_zones = [z for z in zones if z.type == 'target']
-        recruitment_zones = ret_zones + target_zones
+    if recruitment_zones_coordinates is None:
+        ret_zones = [z for z in zones_coordinates if z.type == 'recruitment']
+        target_zones = [z for z in zones_coordinates if z.type == 'target']
+        recruitment_zones_coordinates = ret_zones + target_zones
 
     # count the number of recruitment_zones zones
-    nret_zones = len(recruitment_zones)
+    nret_zones = len(recruitment_zones_coordinates)
 
-    zone = data['release_zone'].values
-
-    if recruitment_zones == 'release':
-        print('No retention zone provided. Asssumes same as release zones')
-        recruitment_zones = release_zones
-    else:
-        recruitment_zones = ret_zones + target_zones
+    release_zone_of_particle = data['release_zone'].values
+    nparticles_per_zone = []
+    for relzone in np.unique(release_zone_of_particle):
+        idrifter = np.nonzero(release_zone_of_particle == relzone)[0]
+        nparticles_per_zone.append(len(idrifter))
+    nparticles_per_zone = np.array(nparticles_per_zone)
 
     output = np.zeros((ntime, nret_zones, nrel_zones), dtype=int)
 
@@ -126,9 +131,9 @@ def compute_connectivity_from_traj(data, release_zones=None, recruitment_zones=N
     for iret in range(0, nret_zones):
 
         # recover the coordinates of the recruitment_zones zone
-        retzone = recruitment_zones[iret].name
-        lonret = recruitment_zones[iret].lon
-        latret = recruitment_zones[iret].lat
+        retzone = recruitment_zones_coordinates[iret].name
+        lonret = recruitment_zones_coordinates[iret].lon
+        latret = recruitment_zones_coordinates[iret].lat
 
         # Conversion of recruitment_zones lat/lon into a proper path object
         path_input = [(xtemp, ytemp) for xtemp, ytemp in zip(lonret, latret)]
@@ -147,7 +152,7 @@ def compute_connectivity_from_traj(data, release_zones=None, recruitment_zones=N
         ialive = np.nonzero(morta == 0)[0]
         lon = lon[ialive]  # ndrifter_ok
         lat = lat[ialive]  # ndrifter_ok
-        zonetemp = zone[ialive]   # ndrifter_ok
+        zonetemp = release_zone_of_particle[ialive]   # ndrifter_ok
 
         # converts all the input points in the right format for paths (done only once)
         list_of_points = np.array([lon, lat]).T   # ndrifter_ok, 2
@@ -175,6 +180,11 @@ def compute_connectivity_from_traj(data, release_zones=None, recruitment_zones=N
             for irel in range(0, nrel_zones):
                 itemp = np.nonzero(zonetemp[idrift] == irel)[0]
                 output[itime, iret, irel] = np.sum(mask[itemp])
+
+                if normalize:
+                    # If normalize, divide by the total number of particles
+                    # released in the zone and returns percentage
+                    output[itime, iret, irel] /= nparticles_per_zone[irel] * 100
 
     # creation of a dataset for saving it
     output = xr.Dataset({'connectivity':(['time', 'retention_zone', 'release_zone'], output)},
