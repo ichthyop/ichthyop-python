@@ -37,13 +37,17 @@ def compute_density(data, nlon=30, nlat=30, zone=None):
 
     lonout = np.linspace(data['lon'].min(), data['lon'].max(), nlon)
     latout = np.linspace(data['lat'].min(), data['lat'].max(), nlat)
+    dlon = np.diff(lonout).mean()
+    dlat = np.diff(latout).mean()
+    lonout2 = np.arange(data['lon'].min() - 0.5*dlon, data['lon'].max() + dlon, dlon)
+    latout2 = np.arange(data['lat'].min() - 0.5*dlat, data['lat'].max() + dlat, dlat)
 
     # Extracting the closest indexex of each cell
     # to understand this formulae. simply keep in mind that lat is a linear function of index,
     # same for longitude
     # this is done here so that the "big" lonout/latout arrays are manipulated only once.
-    indexlon = np.floor((len(lonout) - 1) * (data['lon'] - lonout[0]) / (lonout[-1] - lonout[0]))
-    indexlat = np.floor((len(latout) - 1) * (data['lat'] - latout[0]) / (latout[-1] - latout[0]))
+    indexlon = np.floor((len(lonout2) - 1) * (data['lon'] - lonout2[0]) / (lonout2[-1] - lonout2[0]))
+    indexlat = np.floor((len(latout2) - 1) * (data['lat'] - latout2[0]) / (latout2[-1] - latout2[0]))
 
     # conversion into int (obligatory to use as numpy index)
     indexlon = indexlon.astype(int)    # ntime, ndrifter
