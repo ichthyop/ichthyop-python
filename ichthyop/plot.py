@@ -67,8 +67,10 @@ def plot_traj(data, color='black', size=5, alpha=1):
     :param float alpha: Transparency (1=full, 0=transparent)
 
     .. todo::
+        TODO
         Adding the possibility to use a numpy array instead of a string.
         Idea: add the variable in the data array and then keep going
+        Adding the possibility to plot the trajectories until the recruitment is done, not beyond
 
     """
 
