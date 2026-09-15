@@ -115,7 +115,7 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
                               'time': date, 'zone':(['zone'], zonelist)})
 
     # if the data array as only one zone, it is removed.
-    output = output.squeeze(drop=True)
+    # output = output.squeeze(drop=True)
 
     return output
 
