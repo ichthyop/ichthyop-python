@@ -25,8 +25,8 @@ def plot_connectivity(data, figname):
         tmax = data['time'].max().values
         data = data.mean(dim='time')
 
-    nret = data.dims['retention_zone']
-    nrel = data.dims['release_zone']
+    nret = data.sizes['retention_zone']
+    nrel = data.sizes['release_zone']
 
     # conversion of output into a numpy array
     output = data['connectivity'].values
@@ -86,8 +86,8 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
         stop_on_recruit = False
 
     # number of drifts and time steps
-    ndrift = data.dims['drifter']
-    ntime = data.dims['time']
+    ndrift = data.sizes['drifter']
+    ntime = data.sizes['time']
 
     # add the colorbar
     addcbar = True
@@ -208,8 +208,8 @@ def map_traj(data, color='black', layout='lines', size=5):
     ax = plt.gca()
 
     # number of drifts and time steps
-    ndrift = data.dims['drifter']
-    ntime = data.dims['time']
+    ndrift = data.sizes['drifter']
+    ntime = data.sizes['time']
 
     if(ndrift==ntime):
         message = "Warning: the number of time steps is the same as the number of drifters. "
@@ -245,7 +245,7 @@ def make_movie(data, extent, dirout='./', layout='lines', size=5):
     :param int size: The dot size
     """
 
-    ntime = data.dims['time']
+    ntime = data.sizes['time']
 
     if 'date' in data:
         title = data['date'].values
