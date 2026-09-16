@@ -54,7 +54,7 @@ def plot_connectivity(data, figname):
     plt.close(fig)
 
 
-def plot_traj(data, color='black', size=5, alpha=1):
+def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
 
     """
     Plots the trajectories given a certain basemap.
@@ -73,6 +73,17 @@ def plot_traj(data, color='black', size=5, alpha=1):
         Adding the possibility to plot the trajectories until the recruitment is done, not beyond
 
     """
+
+    if stop_on_recruit and 'recruited_zone' in data:
+        # We first sum over the recruitment_zone dimension to check whether a particule
+        # is recruited or not.
+        # then we cumulute over time. When the value is 0, particle
+        # is not recruited. When it is 1, the particule has just been recruited
+        # we therefore keep trajectories when this value is <= 1
+        is_recruited = data['recruited_zone'].sum(dim=['recruitment_zone']).cumsum(dim='time')
+        print(is_recruited)
+    else:
+        stop_on_recruit = False
 
     # number of drifts and time steps
     ndrift = data.dims['drifter']
@@ -115,7 +126,19 @@ def plot_traj(data, color='black', size=5, alpha=1):
                     cmapname = None
 
     # extracts the map coordinates coordinates
-    x, y = data['lon'].values, data['lat'].values
+    x = data['lon']
+    y = data['lat']
+
+    if stop_on_recruit:
+        y = y.where(is_recruited <= 1)
+        x = x.where(is_recruited <= 1)
+
+    # Also remove dead particles
+    x = x.where(data['mortality'] == 0)
+    y = y.where(data['mortality'] == 0)
+
+    x = x.values
+    y = y.values
 
     # if drifter defines the colormap, then we create a
     # discrete colormap
