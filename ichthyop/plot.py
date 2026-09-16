@@ -81,7 +81,6 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
         # is not recruited. When it is 1, the particule has just been recruited
         # we therefore keep trajectories when this value is <= 1
         is_recruited = data['recruited_zone'].sum(dim=['recruitment_zone']).cumsum(dim='time')
-        print(is_recruited)
     else:
         stop_on_recruit = False
 
