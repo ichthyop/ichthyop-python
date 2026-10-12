@@ -8,3 +8,5 @@ except:
     with open(VERSION_FILE, 'r') as infile:
         __version__ = infile.read().strip()
 
+from .plot import plot_traj, make_movie, plot_density
+from .density import compute_density
