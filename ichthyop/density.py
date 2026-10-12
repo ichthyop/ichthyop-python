@@ -47,6 +47,10 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
     else:
         latmin, latmax = lat_lim
 
+    # Convert to plain floats: 0-d DataArrays break np.linspace with recent numpy
+    lonmin, lonmax = float(lonmin), float(lonmax)
+    latmin, latmax = float(latmin), float(latmax)
+
     if stop_on_recruit and 'recruited_zone' in data:
         # We first sum over the recruitment_zone dimension to check whether a particule
         # is recruited or not.
