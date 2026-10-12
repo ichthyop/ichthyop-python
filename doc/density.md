@@ -94,5 +94,22 @@ Result will be as shown in  {numref}`fig-dens-3`:
 ```{figure} _static/dens3.png
 :name: fig-dens-3
 
-Density plot log-scale colormaps
+Density plot with log-scale colormaps
+```
+
+In {numref}`fig-dens-3`, there is a dark red line which is an accumulation of particles of the recruitment zone.
+
+To remove recruited particles from being counted, use the
+
+```{literalinclude} _static/examples/plot_dens.py
+:lines: 79
+```
+
+Result is displayed in {numref}`fig-dens-4`
+
+
+```{figure} _static/dens4.png
+:name: fig-dens-4
+
+Density plot with log-scale colormaps and discarded recruited particles
 ```

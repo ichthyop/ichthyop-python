@@ -63,7 +63,7 @@ plt.savefig('doc/_static/dens2.png', bbox_inches='tight')
 
 # +
 dens3 = ichthyop.compute_density(data, nlon=61, nlat=61)
-dens3 
+dens3
 
 fig = plt.figure()
 norm = colors.LogNorm(vmin=1, vmax=500)
@@ -77,7 +77,7 @@ plt.savefig('doc/_static/dens3.png', bbox_inches='tight')
 # Possibility to remove particles when they are recruited from the count.
 
 dens4 = ichthyop.compute_density(data, nlon=61, nlat=61, stop_on_recruit=True)
-dens4 
+dens4
 
 fig = plt.figure()
 norm = colors.LogNorm(vmin=1, vmax=500)
@@ -89,10 +89,6 @@ plt.savefig('doc/_static/dens4.png', bbox_inches='tight')
 
 # +
 dens4 = ichthyop.compute_density(data, nlon=50, nlat=50, zone=data['release_zone'])
-
-fig = plt.figure()
-mesh = xr.open_dataset('/home/BARRIER/Work/codes/ichthyop/ichthyop-training/input/roms-benguela.nc')
-mesh
 
 fig = plt.figure(figsize=(12, 8))
 
@@ -107,5 +103,3 @@ cs = ichthyop.plot_density(dens4.isel(zone=2), layout='land+coast', norm=norm)
 
 plt.savefig('doc/_static/dens5.png', bbox_inches='tight')
 # -
-
-
