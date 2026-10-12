@@ -37,13 +37,13 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
 
     if lon_lim is None:
         lonmin = (data['lon'].min())
-        lonmax = (data['lon'].min())
+        lonmax = (data['lon'].max())
     else:
         lonmin, lonmax = lon_lim
 
     if lat_lim is None:
         latmin = (data['lat'].min())
-        latmax = (data['lat'].min())
+        latmax = (data['lat'].max())
     else:
         latmin, latmax = lat_lim
 
@@ -109,6 +109,7 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
             for ii, ij in zip(lontemp[inzone], lattemp[inzone]):
                 density[itime, indzone, ij, ii] += 1
 
+    density = np.ma.masked_where(density == 0, density)
     # creation of a dataset for saving it
     output = xr.Dataset({'density':(['time', 'zone', 'lat', 'lon'], density)},
                           coords={'lon':(['lon'], lonout), 'lat':(['lat'], latout),
