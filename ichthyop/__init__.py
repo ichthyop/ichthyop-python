@@ -10,3 +10,4 @@ except:
 
 from .plot import plot_traj, make_movie, plot_density
 from .density import compute_density
+from .read import extract_zone_array

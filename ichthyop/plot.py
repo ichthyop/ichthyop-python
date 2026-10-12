@@ -196,14 +196,17 @@ def plot_traj(data, color='black', size=5, alpha=1, layout='coastline', stop_on_
         #     cb.set_label(color)
 
     ax = plt.gca()
-    if layout == 'filled':
+    if 'land' in layout:
         ax.add_feature(cfeature.LAND, color='lightgray')
+    if 'ocean' in layout:
         ax.add_feature(cfeature.OCEAN, color='lightblue')
+    if 'coast' in layout:
         ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
-    elif layout == 'etopo':
+
+    if 'etopo' in layout:
+        extent = ax.get_extent()
         ax.stock_img()
-    elif layout == 'coastline':
-        ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
+        ax.set_extent(extent)
 
     return cs
 
@@ -222,14 +225,17 @@ def plot_density(data, layout='filled', **kwargs):
     ax = plt.gca()
     cs = ax.pcolormesh(data['lon'], data['lat'], toplot, transform=ccrs.PlateCarree(), **kwargs)
 
-    if layout == 'filled':
-            ax.add_feature(cfeature.LAND, color='lightgray')
-            ax.add_feature(cfeature.OCEAN, color='lightblue')
-            ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
-    elif layout == 'etopo':
-            ax.stock_img()
-    elif layout == 'coastline':
-            ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
+    if 'land' in layout:
+        ax.add_feature(cfeature.LAND, color='lightgray')
+    if 'ocean' in layout:
+        ax.add_feature(cfeature.OCEAN, color='lightblue')
+    if 'coast' in layout:
+        ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
+
+    if 'etopo' in layout:
+        extent = ax.get_extent()
+        ax.stock_img()
+        ax.set_extent(extent)
 
     return cs
 

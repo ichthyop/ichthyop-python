@@ -23,6 +23,7 @@ Ichthyop Python package
    start
    reading
    plotting
+   density
    api
 
 

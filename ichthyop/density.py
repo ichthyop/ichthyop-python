@@ -6,7 +6,7 @@ from . import read
 from . import plot
 import xarray as xr
 
-def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=None):
+def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=None, stop_on_recruit=False):
 
     '''
     Computes the density, i.e. the number of drifters, within each cell of a
@@ -47,6 +47,19 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
     else:
         latmin, latmax = lat_lim
 
+    if stop_on_recruit and 'recruited_zone' in data:
+        # We first sum over the recruitment_zone dimension to check whether a particule
+        # is recruited or not.
+        # then we cumulute over time. When the value is 0, particle
+        # is not recruited. When it is 1, the particule has just been recruited
+        # we therefore keep trajectories when this value is <= 1
+        is_recruited = data['recruited_zone'].sum(dim=['recruitment_zone']).cumsum(dim='time')
+    else:
+        stop_on_recruit = False
+
+    x = data['lon']
+    y = data['lat']
+
     lonout = np.linspace(lonmin, lonmax, nlon)
     latout = np.linspace(latmin, latmax, nlat)
     dlon = np.diff(lonout).mean()
@@ -58,17 +71,20 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
     # to understand this formulae. simply keep in mind that lat is a linear function of index,
     # same for longitude
     # this is done here so that the "big" lonout/latout arrays are manipulated only once.
-    indexlon = np.floor((len(lonout2) - 1) * (data['lon'] - lonout2[0]) / (lonout2[-1] - lonout2[0]))
-    indexlat = np.floor((len(latout2) - 1) * (data['lat'] - latout2[0]) / (latout2[-1] - latout2[0]))
+    indexlon = np.floor((len(lonout2) - 1) * (x- lonout2[0]) / (lonout2[-1] - lonout2[0]))
+    indexlat = np.floor((len(latout2) - 1) * (y - latout2[0]) / (latout2[-1] - latout2[0]))
 
-    # conversion into int (obligatory to use as numpy index)
-    indexlon = indexlon.astype(int)    # ntime, ndrifter
-    indexlat = indexlat.astype(int)    # ntime, ndrifter
+    # Mask data when recruitment is removed
+    if stop_on_recruit:
+        indexlat = indexlat.where(is_recruited <= 1)
+        indexlon = indexlon.where(is_recruited <= 1)
 
     ntime = data.sizes['time']
     ndrifter = data.sizes['drifter']
 
     if zone is not None:
+        # If a release zone array is given, then
+        # we extract the zone
         zoneout = np.array(zone)
         if (zoneout.ndim != 1) | (len(zoneout) != ndrifter):
             message = "The zone argument must be a 1D array of shape ndrifter"
@@ -89,7 +105,7 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
         # step
         lontemp = indexlon[itime]   # ndrifter
         lattemp = indexlat[itime]   # ndrifter
-        mortemp = data['mortality'][itime]  # ndrifter
+        mortemp = data['mortality'].isel(time=itime)  # ndrifter
 
         # extracts only the indexes of alive larvae
         ialive = np.nonzero((mortemp == 0).values)[0]   # ndrifter_alive
@@ -105,9 +121,15 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
             # extracts the indexes of the larvae that has beeen released in the current zone
             inzone = np.nonzero(tempzone == zonelist[indzone])[0]
 
+            lontempzone = lontemp[inzone] # ndrifter_alive_zone
+            lattempzone = lattemp[inzone] # ndrifter_alive_zone
+
+            lontempzone = lontempzone[~np.isnan(lattempzone)].astype(int)
+            lattempzone = lattempzone[~np.isnan(lattempzone)].astype(int)
+
             # loop over the indexes and update of the density
-            for ii, ij in zip(lontemp[inzone], lattemp[inzone]):
-                density[itime, indzone, ij, ii] += 1
+            for ii, ij in zip(lontempzone, lattempzone):
+                density[itime, indzone, int(ij), int(ii)] += 1
 
     density = np.ma.masked_where(density == 0, density)
     # creation of a dataset for saving it

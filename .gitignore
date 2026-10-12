@@ -22,3 +22,7 @@ doc/generated
 doc/_static/map*png
 doc/_static/temp*png
 doc/_static/*ogg
+
+*ipynb
+
+doc/_static/dens*png

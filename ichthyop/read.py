@@ -33,13 +33,13 @@ def extract_dataset(filename, dmin=None, dmax=None, dstride=None, tmin=None, tma
         raise IOError(message)
 
     # extracts the number of drifter and time records in the file
-    ndrift = data.dims['drifter']
-    ntime = data.dims['time']
+    ndrift = data.sizes['drifter']
+    ntime = data.sizes['time']
 
     # if dmin is None, the first record is extracted
     if dmin is None:
         dmin = 0
-    
+
     # if dmax is None, the last record is extracted
     if dmax is None:
         dmax = ndrift - 1
@@ -51,13 +51,13 @@ def extract_dataset(filename, dmin=None, dmax=None, dstride=None, tmin=None, tma
     # same thing is done for time
     if tmin is None:
         tmin = 0
-  
+
     if tmax is None:
         tmax = ntime - 1
 
     if tstride is None:
         tstride = 1
-    
+
     # switch min and max if necessary
     if(dmin > dmax):
         dmin, dmax = dmax, dmin
@@ -66,44 +66,44 @@ def extract_dataset(filename, dmin=None, dmax=None, dstride=None, tmin=None, tma
 
     # extract the dataset in the defined slices
     data = data.isel(time=slice(tmin, tmax+1, tstride), drifter=slice(dmin, dmax+1, dstride))
-    
-    # extracts the number of drifter and time records in the file
-    ndrift = data.dims['drifter']
-    ntime = data.dims['time']
 
-    if ndrift == 0:  
+    # extracts the number of drifter and time records in the file
+    ndrift = data.sizes['drifter']
+    ntime = data.sizes['time']
+
+    if ndrift == 0:
         message = 'No drift has been selected. This program will stop'
         raise ValueError(message)
 
-    if ntime == 0:  
+    if ntime == 0:
         message = 'No time has been selected. This program will stop'
         raise ValueError(message)
 
     # if drifter not included in data, we add it
     if 'drifter' not in data.keys():
         data['drifter'] = (['drifter'], np.arange(dmin, dmax+1, dstride))
-        
+
     return data
 
 
 def extract_date(data, units=None, calendar=None):
 
-    """ 
-    Transformation of the time attribute from numerical 
+    """
+    Transformation of the time attribute from numerical
     time into :py:class:`datetime.datetime` objects.
 
     If no time units is provided, it is assumed that the units are
     in seconds since the time origin, which is provided in the file as
-    the origin attribute of the time variable in the 
+    the origin attribute of the time variable in the
     format :samp:`year 2013 month 01 day 01 at 00:00`.
-    
+
     If no calendar is provided, the calendar attribute of the time variable
     is used.
 
     :param xarray.Dataset data: Input dataset
     :param str units: Time units.
     :param str calendar: Time calendar
-    
+
     """
 
     if units is None:
@@ -121,25 +121,47 @@ def extract_date(data, units=None, calendar=None):
 
         else:
             origin = data['time'].origin
-            # extraction of the year, month, etc. variables 
+            # extraction of the year, month, etc. variables
             regexp = re.compile('year ([0-9]{4}) month ([0-9]{2}) day ([0-9]{2}) at ([0-9]{2}):([0-9]{2})')
             match = regexp.match(origin)
             year, month, day, hour, minute = match.groups()
 
             # creation of the units variable
             units = 'seconds since %s-%s-%s %s:%s' %(year, month, day, hour, minute)
-    
+
     if calendar is None:
-        
+
         if 'calendar' not in data['time'].attrs:
             message = 'The time variable does not have '
             message += 'an calendar attribute. Therefore, the '
             message += 'calendar argument must be defined.'
             raise ValueError(message)
-    
+
         calendar = data['time'].calendar
 
     # calculation of date, and adding of the date to
     # the dataset
     date = cftime.num2date(data['time'], units, calendar)
     data['time'] = date
+
+
+def extract_zone_array(mask, data, type='release + recruitment'):
+
+    if mask.ndim != 2:
+        print("Mask should be 2D")
+        return
+
+    output =  np.zeros(mask.shape, dtype=int)
+    varlist = [v for v in data.variables if v.startswith('coord_zone')]
+    varlist = [v for v in varlist if data[v].attrs['type'] in type]
+
+    cpt = 1
+    for v in varlist:
+        temp = data[v].values.astype(int)
+        y = temp[:, 0]
+        x = temp[:, 1]
+        output[x, y] = cpt
+        cpt += 1
+
+    output = np.ma.masked_where(output == 0, output)
+    return output

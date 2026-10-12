@@ -46,6 +46,7 @@ extensions = [
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
     'matplotlib.sphinxext.plot_directive',
+    'myst_parser'
 ]
 
 with open('alias.rst', 'r') as pr:
