@@ -4,8 +4,6 @@
 import pylab as plt
 import numpy as np
 import matplotlib.colors
-from matplotlib._cm import datad
-from matplotlib.colors import LinearSegmentedColormap
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
@@ -54,7 +52,7 @@ def plot_connectivity(data, figname):
     plt.close(fig)
 
 
-def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
+def plot_traj(data, color='black', size=5, alpha=1, layout='coastline', stop_on_recruit=False, **kwargs):
 
     """
     Plots the trajectories given a certain basemap.
@@ -73,6 +71,8 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
         Adding the possibility to plot the trajectories until the recruitment is done, not beyond
 
     """
+
+    cs = None
 
     if stop_on_recruit and 'recruited_zone' in data:
         # We first sum over the recruitment_zone dimension to check whether a particule
@@ -97,10 +97,11 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
         addcbar = False
         # default scatter value
         cvalue = color
-        cmapname = None
+        use_cmap = False
 
     else:
-        cmapname = plt.rcParams['image.cmap']
+        use_cmap = True
+        # cmapname = plt.rcParams['image.cmap']
         cvalue = data[color].values
         # if one dimensional
         if cvalue.ndim == 1:
@@ -119,10 +120,12 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
                     # transpose the data if proper dimensions
                     cvalue = cvalue.shape
                 else:
+                    print(f'Cannot properly set coloring based on the {color} variable.')
+                    print(f'Everything will be plotted in black')
                     # dimensions are not good => everything drawn in black
                     cvalue = 'black'
                     addcbar = False
-                    cmapname = None
+                    use_cmap = False
 
     # extracts the map coordinates coordinates
     x = data['lon']
@@ -141,7 +144,8 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
 
     # if drifter defines the colormap, then we create a
     # discrete colormap
-    if color == 'drifter':
+    if False:
+    # if color == 'drifter':
 
         # recover the drifter values and stride
         drifter = data[color].values
@@ -155,20 +159,18 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
         # creation of the normalisation
         norm = matplotlib.colors.BoundaryNorm(boundaries, ncolors=ncolors)
 
-        # extraction of the colormap from the dictionnary and
+        # extraction of the colormap from the registry and
         # creation of the discrete colormap
-        if cmapname in datad.keys():
-            dictout = datad[cmapname]
-        else:
-            dictout = datad['jet']
-        cmap = LinearSegmentedColormap('', dictout, N=ncolors)
+        if cmapname not in matplotlib.colormaps:
+            cmapname = 'jet'
+        cmap = matplotlib.colormaps[cmapname].resampled(ncolors)
 
         # draws the scatter plot
         cs = plt.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', norm=norm, cmap=cmap, alpha=alpha, transform=ccrs.PlateCarree())
 
         # add the colorbar
-        cb = plt.colorbar(cs, orientation='horizontal')
-        cb.set_label(color)
+        # cb = plt.colorbar(cs, orientation='horizontal')
+        # cb.set_label(color)
 
         nmax = 11
         if(len(drifter) > nmax):
@@ -177,56 +179,59 @@ def plot_traj(data, color='black', size=5, alpha=1, stop_on_recruit=True):
         else:
             ticks = drifter
 
-        cb.set_ticks(ticks)
+        # cb.set_ticks(ticks)
 
     else:
+
+        if use_cmap:
         # draws the scatter plot
-        cs = plt.scatter(x, y, c=cvalue, s=size, marker='o', edgecolors='none', cmap=cmapname, alpha=alpha, transform=ccrs.PlateCarree())
-
-        if addcbar:
-            # add the colorbar if necessary
-            cb = plt.colorbar(cs, orientation='horizontal')
-            cb.set_label(color)
+            cs = plt.scatter(x, y, c=cvalue, transform=ccrs.PlateCarree(), **kwargs)
+        else:
+            cs = plt.plot(x, y, color=color, transform=ccrs.PlateCarree(), **kwargs)
 
 
-def map_traj(data, color='black', layout='lines', size=5):
-
-    """
-    Draws the Ichthyop trajectories on a map.
-
-    :param xarray.Dataset data: Input dataset
-    :param str color: Name of the variable used to
-     color trajectories ('drifter', 'time', 'depth', etc).
-    :param str layout: Map layout ('filled' for filled continents, 'etopo'
-     for ETOPO map background, 'lines' for coastlines).
-    :param int size: Size of the dots in the scatter plot
-    :param dict projection: Cartopy Projection (crs object). If None, PlateCarree()
-
-    """
+        # if addcbar:
+        #     # add the colorbar if necessary
+        #     cb = plt.colorbar(cs, orientation='horizontal')
+        #     cb.set_label(color)
 
     ax = plt.gca()
-
-    # number of drifts and time steps
-    ndrift = data.sizes['drifter']
-    ntime = data.sizes['time']
-
-    if(ndrift==ntime):
-        message = "Warning: the number of time steps is the same as the number of drifters. "
-        message += "Consequently, all 1D variables will be considered as depending on time. "
-        message += "The resulting plot might thus be wrong. Consider changing the number of drifters"
-        print(message)
-
     if layout == 'filled':
         ax.add_feature(cfeature.LAND, color='lightgray')
+        ax.add_feature(cfeature.OCEAN, color='lightblue')
         ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
     elif layout == 'etopo':
         ax.stock_img()
     elif layout == 'coastline':
         ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
 
-    # plot the trajectory
-    plot_traj(data, color, size)
+    return cs
 
+
+def plot_density(data, layout='filled', **kwargs):
+
+    toplot = data['density'].squeeze()
+    if 'time' in toplot.dims:
+        print("Sum density over time")
+        toplot = toplot.sum(dim='time')
+    if 'zone' in toplot.dims:
+        print("Sum density over zones")
+        toplot = toplot.sum(dim='zone')
+
+    toplot = toplot.where(toplot != 0)
+    ax = plt.gca()
+    cs = ax.pcolormesh(data['lon'], data['lat'], toplot, transform=ccrs.PlateCarree(), **kwargs)
+
+    if layout == 'filled':
+            ax.add_feature(cfeature.LAND, color='lightgray')
+            ax.add_feature(cfeature.OCEAN, color='lightblue')
+            ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
+    elif layout == 'etopo':
+            ax.stock_img()
+    elif layout == 'coastline':
+            ax.add_feature(cfeature.COASTLINE, linewidth=0.5)
+
+    return cs
 
 def make_movie(data, extent, dirout='./', layout='lines', size=5):
 
@@ -265,7 +270,7 @@ def make_movie(data, extent, dirout='./', layout='lines', size=5):
         ax = plt.axes(projection = ccrs.PlateCarree())
         layfunc(ax)
         ax.set_extent(extent)
-        plot_traj(temp, 'drifter', size=size)
+        plot_traj(temp, 'drifter', size=size, layout=layout)
         plt.title(title[it])
         plt.savefig('%s/temp_%.5d' %(dirout, it), bbox_inches='tight')
         plt.close(fig)
