@@ -41,6 +41,7 @@ dens1 = ichthyop.compute_density(data)
 dens1
 
 projout = ccrs.PlateCarree()
+fig = plt.figure()
 ax = plt.axes(projection=projout)
 cs = ichthyop.plot_density(dens1, layout='coast+ocean+land')
 cb = plt.colorbar(cs, orientation='vertical')
@@ -51,7 +52,7 @@ plt.savefig('doc/_static/dens1.png', bbox_inches='tight')
 dens2 = ichthyop.compute_density(data, lon_lim=[15, 19], lat_lim=[-35, -29], nlon=100, nlat=100)
 dens2
 
-projout = ccrs.PlateCarree()
+fig = plt.figure()
 ax = plt.axes(projection=projout)
 cs = ichthyop.plot_density(dens2, layout='coastline+ocean+land')
 cb = plt.colorbar(cs, orientation='vertical')
@@ -60,19 +61,25 @@ plt.savefig('doc/_static/dens2.png', bbox_inches='tight')
 
 # Possible also to display as a log-scale
 
+# +
 dens3 = ichthyop.compute_density(data, nlon=61, nlat=61)
+dens3 
+
+fig = plt.figure()
 norm = colors.LogNorm(vmin=1, vmax=500)
 ax = plt.axes(projection=projout)
 cs = ichthyop.plot_density(dens3, layout='coastline', norm=norm, cmap=mpl.colormaps['jet'])
 cb = plt.colorbar(cs, orientation='vertical')
 cb.set_label('Number of particles')
 plt.savefig('doc/_static/dens3.png', bbox_inches='tight')
+# -
 
 # Possibility to remove particles when they are recruited from the count.
 
 dens4 = ichthyop.compute_density(data, nlon=61, nlat=61, stop_on_recruit=True)
-dens4
+dens4 
 
+fig = plt.figure()
 norm = colors.LogNorm(vmin=1, vmax=500)
 ax = plt.axes(projection=projout)
 cs = ichthyop.plot_density(dens4, layout='coastline', norm=norm, cmap=mpl.colormaps['jet'])
@@ -83,6 +90,7 @@ plt.savefig('doc/_static/dens4.png', bbox_inches='tight')
 # +
 dens4 = ichthyop.compute_density(data, nlon=50, nlat=50, zone=data['release_zone'])
 
+fig = plt.figure()
 mesh = xr.open_dataset('/home/BARRIER/Work/codes/ichthyop/ichthyop-training/input/roms-benguela.nc')
 mesh
 
@@ -99,3 +107,5 @@ cs = ichthyop.plot_density(dens4.isel(zone=2), layout='land+coast', norm=norm)
 
 plt.savefig('doc/_static/dens5.png', bbox_inches='tight')
 # -
+
+
