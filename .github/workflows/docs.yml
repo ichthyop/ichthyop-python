@@ -1,0 +1,61 @@
+name: Build and deploy documentation
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Update submodules to latest remote
+        run: git submodule update --remote --merge
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -y
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y pandoc libnetcdf-dev
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install sphinx sphinxcontrib-bibtex sphinxcontrib-htmlhelp sphinxcontrib-mermaid sphinxcontrib-programoutput sphinx-rtd-theme linkify-it-py
+          pip install ipython myst_parser nbsphinx pandoc
+          pip install xarray cartopy netCDF4 nc-time-axis psutil jinja2 dask pickleshare
+          pip install .
+
+      - name: Build documentation
+        run: sphinx-build -b html doc/ public
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

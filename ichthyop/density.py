@@ -17,6 +17,7 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
         longrid = np.linspace(data['lon'].min(), data['lon'].max(), nlon)
         latgrid = np.linspace(data['lat'].min(), data['lat'].max(), nlat)
 
+
     .. todo::
 
         Same thing but on an irregular grid (NEMO for instance). But memory and slow
@@ -25,11 +26,11 @@ def compute_density(data, lon_lim=None, lat_lim=None, nlon=30, nlat=30, zone=Non
     :param xarray.Dataset data: Input dataset containing the trajectories
     :param int nlon: The number of longitudes in the regular grid
     :param int nlat: The number of latitudes in the regular grid
-    :param numpy.array: An index of size :samp:`ndrifter`, over which density
+    :param numpy.array zone: An index of size :samp:`ndrifter`, over which density
      may be summed. It may be for index an index of release zones.
 
     :return: A xarray.Dataset containing the coordinates of the regular grid
-    and the density, and eventually the zone.
+     and the density, and eventually the zone.
 
     '''
 

@@ -21,8 +21,8 @@ build-pages:
   - pip install sphinx sphinxcontrib-bibtex sphinxcontrib-htmlhelp sphinxcontrib-mermaid sphinxcontrib-programoutput sphinx-rtd-theme linkify-it-py
   - pip install ipython myst_parser nbsphinx pandoc
   - pip install xarray cartopy netCDF4 nc-time-axis psutil jinja2 dask pickleshare
-  - pip install . 
-  - sphinx-build -b html doc/ public  
+  - pip install .
+  - sphinx-build -b html doc/ public
   artifacts:
     paths:
     - public
