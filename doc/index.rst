@@ -24,6 +24,7 @@ Ichthyop Python package
    reading
    plotting
    density
+   connectivity
    api
 
 
