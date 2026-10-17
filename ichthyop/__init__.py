@@ -10,7 +10,8 @@ except:
 
 from .plot import plot_traj, make_movie, plot_density, plot_connectivity, plot_zone_labels
 from .density import compute_density
-from .read import extract_zone_array
+from .read import extract_zone_array, extract_dataset, extract_date
 from .connectivity import compute_connectivity_from_traj, compute_connectivity
 from .zone import Zone
 from .distances import compute_distances
+from .shape import Shape

@@ -38,29 +38,29 @@ The reading of |ich| datasets is performed by using the :py:func:`plot.map_traj`
 Movies
 ----------------------------
 
-.. ipython:: python
-    :suppress:
-    :okwarning:
+.. .. ipython:: python
+..     :suppress:
+..     :okwarning:
 
-    import os
-    cwd = os.getcwd()
-    print(cwd)
+..     import os
+..     cwd = os.getcwd()
+..     print(cwd)
 
-    fpath = "doc/_static/examples/make_movie.py"
-    with open(fpath) as f:
-        code = compile(f.read(), fpath, 'exec')
-    exec(code)
+..     fpath = "doc/_static/examples/make_movie.py"
+..     with open(fpath) as f:
+..         code = compile(f.read(), fpath, 'exec')
+..     exec(code)
 
-.. ipython:: python
-    :suppress:
-    :okwarning:
+.. .. ipython:: python
+..     :suppress:
+..     :okwarning:
 
-    import os
-    import subprocess
-    cwd = os.getcwd()
+..     import os
+..     import subprocess
+..     cwd = os.getcwd()
 
-    subprocess.call(['mkdir', '-p', '_build/html/_static'])
-    subprocess.call(['cp', '-prfv', '_static/movie.ogg', '_build/html/_static'])
+..     subprocess.call(['mkdir', '-p', '_build/html/_static'])
+..     subprocess.call(['cp', '-prfv', '_static/movie.ogg', '_build/html/_static'])
 
 
 The :py:func:`plot.make_movie` allows to make movies of the drifter trajectories.
@@ -82,11 +82,11 @@ The :samp:`-y` option allows overwritting without asking, the :samp:`-framerate`
 
 .. literalinclude:: _static/examples/make_movie.py
 
-.. raw:: html
+.. .. raw:: html
 
-    <div>
-        <video width="500"  controls>
-            <source src="doc/_static/movie.ogg" type="video/ogg">
-            Video
-        </video>
-    </div>
+..     <div>
+..         <video width="500"  controls>
+..             <source src="doc/_static/movie.ogg" type="video/ogg">
+..             Video
+..         </video>
+..     </div>

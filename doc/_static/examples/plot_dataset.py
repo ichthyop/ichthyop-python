@@ -15,7 +15,7 @@ pointsize = 20
 # plot trajectories without colors
 fig = plt.figure()
 ax = plt.axes(projection=ccrs.PlateCarree())
-ichplot.plot_traj(data, layout='filled', size=pointsize)
+ichplot.plot_traj(data, layout='land+coast', size=pointsize)
 plt.title('No col.')
 plt.savefig('doc/_static/map1.png', bbox_inches='tight')
 plt.close(fig)
@@ -23,7 +23,7 @@ plt.close(fig)
 # plot trajectories with colors associated with drifter
 fig = plt.figure()
 ax = plt.axes(projection=ccrs.PlateCarree())
-ichplot.plot_traj(data, layout='filled', color='drifter', size=pointsize)
+ichplot.plot_traj(data, layout='land+coast', color='drifter', size=pointsize)
 plt.title('Drifter')
 plt.savefig('doc/_static/map2.png', bbox_inches='tight')
 extent = ax.get_extent()

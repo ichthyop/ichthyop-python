@@ -10,8 +10,16 @@ Reading outputs
 .. autosummary::
    :toctree: generated/
 
-   read.extract_dataset
-   read.extract_date
+   extract_dataset
+   extract_date
+
+Plotting trajectories
+====================
+.. autosummary::
+   :toctree: generated/
+
+   plot_traj
+   make_movie
 
 Density
 =====================
@@ -21,13 +29,15 @@ Density
    compute_density
    plot_density
 
-Plotting outputs
-====================
+Connectivity
+=====================
 .. autosummary::
    :toctree: generated/
 
-   plot.plot_traj
-   plot.make_movie
+   compute_connectivity
+   plot_connectivity
+
+
 
 Manipulating shapes
 ===================
