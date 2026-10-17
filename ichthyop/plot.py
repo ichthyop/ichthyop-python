@@ -7,7 +7,7 @@ import matplotlib.colors
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-def plot_connectivity(data, figname):
+def plot_connectivity(data, **kwargs):
 
     """
     Draws the connectivity matrix. If it contains a
@@ -34,11 +34,8 @@ def plot_connectivity(data, figname):
     x = np.arange(0, nrel)
     y = np.arange(0, nret)
 
-    fig = plt.figure()
     ax = plt.gca()
-    cs =  plt.imshow(output, interpolation='none')
-    cb = plt.colorbar(cs)
-    cb.set_label('Density')
+    cs =  plt.imshow(output, interpolation='none', origin='lower', **kwargs)
     ax.set_xticks(x)
     ax.set_yticks(y)
     ax.set_xticklabels(data['release_zone'].values, ha='right', rotation=45, fontsize=8)
@@ -47,9 +44,8 @@ def plot_connectivity(data, figname):
     plt.ylabel('Retention zone')
     plt.xlim(-0.5, nrel-0.5)
     plt.ylim(-0.5, nret-0.5)
-    plt.grid()
-    plt.savefig(figname, bbox_inches='tight')
-    plt.close(fig)
+    return cs
+
 
 
 def plot_traj(data, color='black', size=5, alpha=1, layout='coastline', stop_on_recruit=False, **kwargs):
@@ -280,3 +276,26 @@ def make_movie(data, extent, dirout='./', layout='lines', size=5):
         plt.title(title[it])
         plt.savefig('%s/temp_%.5d' %(dirout, it), bbox_inches='tight')
         plt.close(fig)
+
+
+def plot_zone_labels(lon, lat, data, **kwargs):
+
+    if lon.ndim != 2:
+        raise("lon should be 2D")
+
+    if lat.ndim != 2:
+        raise("lon should be 2D")
+
+    varlist = [v for v in data.variables if v.startswith('coord_zone')]
+    varname = [data[v.replace('_geo', '')].attrs['long_name'] for v in varlist]
+
+    cpt = 0
+    for v in varlist:
+        temp = data[v].values.astype(int)
+        y = temp[:, 0]
+        x = temp[:, 1]
+
+        lon0 = np.mean(lon[x, y])
+        lat0 = np.mean(lat[x, y])
+        plt.text(lon0, lat0, varname[cpt], ha='center', va='center')
+        cpt += 1

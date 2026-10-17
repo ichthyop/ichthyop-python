@@ -9,6 +9,24 @@ from . import shape
 from . import read
 from . import zone as _zone
 
+def _make_release_zone(loninit, latinit, path_release):
+
+    list_of_points = np.array([loninit, latinit])
+
+    release_zone = np.zeros(loninit.shape) - 999
+    for i in range(len(path_release)):
+
+        # determines wheter the drifters are within the retention zone or not
+        mask = path_release.contains_points(list_of_points)  # ndrifter_ok
+        release_zone[mask] = i
+
+    return release_zone
+
+def _convert_lon_lat_to_path(lon, lat):
+
+    path_out = [(xtemp, ytemp) for xtemp, ytemp in zip(lon, lat)]
+    return path.Path(path_out)
+
 def process_release_zones(data):
 
     # Extract the release zone variable
@@ -40,15 +58,24 @@ def process_release_zones(data):
     Computes the connectivity matrix from the Ichthyop recruitment and release output variables.
     This method is faster and strongly recommended
 """
-def compute_connectivity_from_file(data, normalize=True):
+def compute_connectivity(data, normalize=True):
+
+    if 'release_zone' not in data.variables:
+        raise('Error. Release zones not in dataset')
+    if 'recruited_zone' not in data.variables:
+        raise('Error. Release zones not in dataset')
 
     ntime = data.sizes['time']
     ndrifter = data.sizes['drifter']
 
+    # Pare all the zones from files
     zones = _zone.parse_zones(data)
+
+    # Extract release zones
     release_zones = [z for z in zones if z.type == 'release']
     release_names = [z.name for z in release_zones]
 
+    # Extract recruitment zones + target zones
     ret_zones = [z for z in zones if z.type == 'recruitment']
     target_zones = [z for z in zones if z.type == 'target']
     recruitment_zones = ret_zones + target_zones
@@ -83,6 +110,12 @@ def compute_connectivity_from_file(data, normalize=True):
                           coords={'release_zone':(['release_zone'], release_names),
                                   'retention_zone':(['retention_zone'], recruitment_zones_names),
                                   'time': data['time']})
+
+    if normalize:
+        output['connectivity'].attrs['units'] = '%'
+    else:
+        output['connectivity'].attrs['units'] = 'number of particles'
+
     return output
 
 
@@ -90,6 +123,9 @@ def compute_connectivity_from_file(data, normalize=True):
     Computes the connectivity matrix from the Ichthyop trajectories (i.e. longitude and latitude)
     This method is slower but can be used to assess connectivity matrix based on manually defined
     release and target zones.
+
+    TODO: Correct this to create the "release_zone vector" zone manually
+    TODO: Also make a function isInPolygon to make code more readable
 """
 def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinates=None, recruitment_zones_coordinates=None):
 
@@ -101,20 +137,36 @@ def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinat
 
     if(release_zones_coordinates is None):
         release_zones_coordinates = [z for z in zones_coordinates if z.type == 'release']
-    nrel_zones = len(release_zones_coordinates)
+
     release_names = [z.name for z in release_zones_coordinates]
+    nrel_zones = len(release_zones_coordinates)
 
     if recruitment_zones_coordinates is None:
         ret_zones = [z for z in zones_coordinates if z.type == 'recruitment']
         target_zones = [z for z in zones_coordinates if z.type == 'target']
         recruitment_zones_coordinates = ret_zones + target_zones
 
+    if (len(release_zones_coordinates) == 0) | (len(recruitment_zones_coordinates) == 0):
+        raise('No recruitment or release zones provided')
+
     # count the number of recruitment_zones zones
     nret_zones = len(recruitment_zones_coordinates)
 
+    path_release = []
+    for relzone in release_zones_coordinates:
+        pathout = _convert_lon_lat_to_path(relzone.lon, relzone.lat)
+        path_release.append(pathout)
+
+    release_zone_of_particle = _make_release_zone(data['lon_init'].values, data['lat_init'].values, path_release)
+
+    # Count the number of particles that were released in the release zone.
     release_zone_of_particle = data['release_zone'].values
     nparticles_per_zone = []
-    for relzone in np.unique(release_zone_of_particle):
+
+    unique_release_zone = np.unique(release_zone_of_particle)
+    unique_release_zone = unique_release_zone[unique_release_zone >= 0]
+
+    for relzone in unique_release_zone:
         idrifter = np.nonzero(release_zone_of_particle == relzone)[0]
         nparticles_per_zone.append(len(idrifter))
     nparticles_per_zone = np.array(nparticles_per_zone)
@@ -133,8 +185,8 @@ def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinat
         latret = recruitment_zones_coordinates[iret].lat
 
         # Conversion of recruitment_zones lat/lon into a proper path object
-        path_input = [(xtemp, ytemp) for xtemp, ytemp in zip(lonret, latret)]
-        path_ret.append(path.Path(path_input))
+        pathout = _convert_lon_lat_to_path(lonret, latret)
+        path_ret.append(pathout)
         recruitment_zones_names.append(retzone)
 
     # loop over all the time steps
@@ -190,6 +242,7 @@ def compute_connectivity_from_traj(data, normalize=True, release_zones_coordinat
                                   'time': data['time']})
 
     return output
+
 
 
 

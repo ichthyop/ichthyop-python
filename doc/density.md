@@ -48,7 +48,7 @@ a `zone` dimension of 1.
 Next, the density map can be plotted using the [plot_density](#ichthyop.plot_density) function:
 
 ```{literalinclude} _static/examples/plot_dens.py
-:lines: 40-41
+:lines: 43-48
 ```
 
 ```{admonition} Note
@@ -67,10 +67,10 @@ Result is as shown in {numref}`fig-dens-1`
 Standard density plot
 ```
 
-It is also possible possible to manually specify the zonal extent and the "resolution"
+It is also possible possible to manually specify the zonal extent and the "resolution" of the density map
 
 ```{literalinclude} _static/examples/plot_dens.py
-:lines: 51
+:lines: 52-53
 ```
 
 The result will be as shown in {numref}`fig-dens-2`:
@@ -86,7 +86,7 @@ Note that it is possible to control the way to display density. For example
 you can specify a logarithmic colormap. This would be achieved as follows:
 
 ```{literalinclude} _static/examples/plot_dens.py
-:lines: 63-69
+:lines: 68-74
 ```
 
 Result will be as shown in  {numref}`fig-dens-3`:
